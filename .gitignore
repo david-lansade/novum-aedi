@@ -1,0 +1,29 @@
+# Fiches Avelis confidentielles : jamais committées
+docs/
+
+# Sorties générées par l'application et les tests
+captures/
+exports/
+__pycache__/
+*.pyc
+
+# Base de l'application de scan (créée au premier lancement)
+avelis_scan/donnees/
+
+# Vue 3D : paquets npm (réinstallés par « npm ci ») et scène de développement
+node_modules/
+avelis_3d/scene.json
+
+# Réglages locaux (éditeur, assistant de code, environnement)
+.claude/
+CLAUDE.md
+.vscode/
+.idea/
+.env
+.env.*
+*.bundle
+
+# Système
+.DS_Store
+Thumbs.db
+desktop.ini

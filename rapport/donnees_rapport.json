@@ -1,0 +1,593 @@
+{
+ "simulation": {
+  "Proposée : Torcy + extension (flux en U)": {
+   "taux_atteinte": 0.9930555555555556,
+   "debit": 8.125,
+   "delai_moyen_h": 23.457203246640244,
+   "delai_p90_h": 25.465672790315217,
+   "en_cours": 11.18408736349454,
+   "distance_totale_km": 74.751,
+   "sous_ensemble_m": 681.0,
+   "ruptures_attentes": 6,
+   "utilisation": {
+    "Postes de kitting": 0.2721424195782051,
+    "Ligne 2D": 0.6302349176611103,
+    "Poste 1 Châssis": 0.4542002591974426,
+    "Poste 2 Parois + étanchéité": 0.5684310267624403,
+    "Poste 3 Plomberie-élec": 0.5193592873009546,
+    "Poste 4 Finitions": 0.4831726387837448,
+    "Baies d'assemblage 3D": 0.6727849689884524,
+    "Contrôle final": 0.22241374096139585,
+    "AGV": 0.1308764119472001,
+    "Porteurs": 0.08160937500000164,
+    "Quais de réception": 0.14700983011615748,
+    "Quais d'expédition": 0.17449947583554812
+   },
+   "distances_plan": {
+    "pod": 475.0,
+    "2D": 343.0,
+    "module": 206.0,
+    "sous_ensemble": 681.0,
+    "detail": {
+     "pod": [
+      [
+       "Réception",
+       "Stock matières",
+       93.0
+      ],
+      [
+       "Stock matières",
+       "Kitting",
+       101.0
+      ],
+      [
+       "Kitting",
+       "Ligne pods",
+       82.0
+      ],
+      [
+       "Ligne pods",
+       "Assemblage 3D",
+       199.0
+      ]
+     ],
+     "2D": [
+      [
+       "Kitting",
+       "Ligne 2D robotisée",
+       73.0
+      ],
+      [
+       "Ligne 2D robotisée",
+       "Assemblage 3D",
+       270.0
+      ]
+     ],
+     "module": [
+      [
+       "Assemblage 3D",
+       "Contrôle final",
+       82.0
+      ],
+      [
+       "Contrôle final",
+       "Stock produits finis",
+       40.0
+      ],
+      [
+       "Stock produits finis",
+       "Expédition",
+       84.0
+      ]
+     ]
+    }
+   },
+   "croisements": 0
+  },
+  "Actuelle : site seul (sans extension)": {
+   "taux_atteinte": 0.9930555555555556,
+   "debit": 8.125,
+   "delai_moyen_h": 23.564342432626653,
+   "delai_p90_h": 25.636194982966117,
+   "en_cours": 11.218408736349454,
+   "distance_totale_km": 84.917,
+   "sous_ensemble_m": 1018.0,
+   "ruptures_attentes": 10,
+   "utilisation": {
+    "Postes de kitting": 0.269920744297854,
+    "Ligne 2D": 0.6332645129614255,
+    "Poste 1 Châssis": 0.445066963033811,
+    "Poste 2 Parois + étanchéité": 0.566025819422593,
+    "Poste 3 Plomberie-élec": 0.512449414557472,
+    "Poste 4 Finitions": 0.4804979574341641,
+    "Baies d'assemblage 3D": 0.671648053307123,
+    "Contrôle final": 0.2173586432184905,
+    "AGV": 0.11305092592592719,
+    "Porteurs": 0.14781510416666963,
+    "Quais partagés (réception + expédition)": 0.33628256686930674
+   },
+   "distances_plan": {
+    "pod": 442.0,
+    "2D": 177.0,
+    "module": 576.0,
+    "sous_ensemble": 1018.0,
+    "detail": {
+     "pod": [
+      [
+       "Réception",
+       "Stock matières",
+       93.0
+      ],
+      [
+       "Stock matières",
+       "Kitting",
+       82.0
+      ],
+      [
+       "Kitting",
+       "Ligne pods",
+       127.0
+      ],
+      [
+       "Ligne pods",
+       "Assemblage 3D",
+       140.0
+      ]
+     ],
+     "2D": [
+      [
+       "Kitting",
+       "Ligne 2D robotisée",
+       95.0
+      ],
+      [
+       "Ligne 2D robotisée",
+       "Assemblage 3D",
+       82.0
+      ]
+     ],
+     "module": [
+      [
+       "Assemblage 3D",
+       "Contrôle final",
+       74.0
+      ],
+      [
+       "Contrôle final",
+       "Stock produits finis",
+       223.0
+      ],
+      [
+       "Stock produits finis",
+       "Expédition",
+       279.0
+      ]
+     ]
+    }
+   },
+   "croisements": 2
+  },
+  "Optimisée : Torcy + extension": {
+   "taux_atteinte": 0.9930555555555556,
+   "debit": 8.125,
+   "delai_moyen_h": 22.948993580783686,
+   "delai_p90_h": 24.975666775669392,
+   "en_cours": 10.956318252730108,
+   "distance_totale_km": 54.0235,
+   "sous_ensemble_m": 579.5,
+   "ruptures_attentes": 4,
+   "utilisation": {
+    "Postes de kitting": 0.2755305370144921,
+    "Ligne 2D": 0.607265118321475,
+    "Poste 1 Châssis": 0.44079542187790416,
+    "Poste 2 Parois + étanchéité": 0.5519424084553616,
+    "Poste 3 Plomberie-élec": 0.5084077375740461,
+    "Poste 4 Finitions": 0.4694414924849815,
+    "Baies d'assemblage 3D": 0.6603149860121458,
+    "Contrôle final": 0.21870280015453478,
+    "AGV": 0.10967175413808478,
+    "Porteurs": 0.07413671875000173,
+    "Quais de réception": 0.1442374186372664,
+    "Quais d'expédition": 0.17153427349286995
+   },
+   "distances_plan": {
+    "pod": 411.0,
+    "2D": 177.0,
+    "module": 168.5,
+    "sous_ensemble": 579.5,
+    "detail": {
+     "pod": [
+      [
+       "Réception",
+       "Stock matières",
+       93.0
+      ],
+      [
+       "Stock matières",
+       "Kitting",
+       89.0
+      ],
+      [
+       "Kitting",
+       "Ligne pods",
+       72.0
+      ],
+      [
+       "Ligne pods",
+       "Assemblage 3D",
+       157.0
+      ]
+     ],
+     "2D": [
+      [
+       "Kitting",
+       "Ligne 2D robotisée",
+       53.0
+      ],
+      [
+       "Ligne 2D robotisée",
+       "Assemblage 3D",
+       124.0
+      ]
+     ],
+     "module": [
+      [
+       "Assemblage 3D",
+       "Contrôle final",
+       82.0
+      ],
+      [
+       "Contrôle final",
+       "Stock produits finis",
+       40.0
+      ],
+      [
+       "Stock produits finis",
+       "Expédition",
+       46.5
+      ]
+     ]
+    }
+   },
+   "croisements": 0
+  }
+ },
+ "jumeau": {
+  "precision": {
+   "erreur_moyenne_min": 52.879815650296024,
+   "erreur_naive_min": 79.78936537871404,
+   "modules_testes": 36,
+   "previsions": 216
+  },
+  "postes": [
+   {
+    "etape": "Poste 2 Parois + étanchéité",
+    "etat": "anormal",
+    "rapport": 5.0,
+    "reference_min": 2.0,
+    "recente_min": 10.0,
+    "passages": 8
+   },
+   {
+    "etape": "Poste 1 Châssis",
+    "etat": "normal",
+    "rapport": 1.0,
+    "reference_min": 2.0,
+    "recente_min": 2.0,
+    "passages": 8
+   },
+   {
+    "etape": "Poste 3 Plomberie-élec",
+    "etat": "normal",
+    "rapport": 1.0,
+    "reference_min": 2.0,
+    "recente_min": 2.0,
+    "passages": 8
+   },
+   {
+    "etape": "Poste 4 Finitions",
+    "etat": "normal",
+    "rapport": 1.0,
+    "reference_min": 2.0,
+    "recente_min": 2.0,
+    "passages": 8
+   },
+   {
+    "etape": "Contrôle pod OK",
+    "etat": "normal",
+    "rapport": 1.0,
+    "reference_min": 2.0,
+    "recente_min": 2.0,
+    "passages": 8
+   }
+  ]
+ },
+ "nucleaire": {
+  "proche": {
+   "A": {
+    "cout_par_logement": 5501.187028008269,
+    "cout_total_an": 6601424.433609923,
+    "cout_transport_an": 6601424.433609923,
+    "couts_fixes_an": 0.0,
+    "co2_t_an": 1941.5954216499774,
+    "distance_moyenne_km": 674.1650769617977,
+    "delai_moyen_h": 11.236084616029961,
+    "km_an": 1941595.4216499773,
+    "satellites_utilises": [],
+    "part_directe": 1.0
+   },
+   "B": {
+    "cout_par_logement": 5046.821263116258,
+    "cout_total_an": 6056185.51573951,
+    "cout_transport_an": 2056185.5157395096,
+    "couts_fixes_an": 4000000.0,
+    "co2_t_an": 790.6123342237792,
+    "distance_moyenne_km": 676.7670504732295,
+    "delai_moyen_h": 9.451046846367081,
+    "km_an": 790612.3342237792,
+    "satellites_utilises": [
+     "Arras",
+     "Caen"
+    ],
+    "part_directe": 0
+   },
+   "bascule": 1100
+  },
+  "hybride": {
+   "A": {
+    "cout_par_logement": 5501.187028008269,
+    "cout_total_an": 6601424.433609923,
+    "cout_transport_an": 6601424.433609923,
+    "couts_fixes_an": 0.0,
+    "co2_t_an": 1941.5954216499774,
+    "distance_moyenne_km": 674.1650769617977,
+    "delai_moyen_h": 11.236084616029961,
+    "km_an": 1941595.4216499773,
+    "satellites_utilises": [],
+    "part_directe": 1.0
+   },
+   "B": {
+    "cout_par_logement": 5046.821263116258,
+    "cout_total_an": 6056185.51573951,
+    "cout_transport_an": 2056185.5157395096,
+    "couts_fixes_an": 4000000.0,
+    "co2_t_an": 790.6123342237792,
+    "distance_moyenne_km": 676.7670504732295,
+    "delai_moyen_h": 9.451046846367081,
+    "km_an": 790612.3342237792,
+    "satellites_utilises": [
+     "Arras",
+     "Caen"
+    ],
+    "part_directe": 0
+   },
+   "bascule": 1100
+  },
+  "distances": {
+   "Gravelines": 650.3357491129333,
+   "Flamanville": 729.7668419424816
+  }
+ },
+ "nucleaire_forains": {
+  "proche": {
+   "A": {
+    "cout_par_logement": 5501.187028008269,
+    "cout_total_an": 6601424.433609923,
+    "cout_transport_an": 6601424.433609923,
+    "couts_fixes_an": 0.0,
+    "co2_t_an": 1941.5954216499774,
+    "distance_moyenne_km": 674.1650769617977,
+    "delai_moyen_h": 11.236084616029961,
+    "km_an": 1941595.4216499773,
+    "satellites_utilises": [],
+    "part_directe": 1.0
+   },
+   "B": {
+    "cout_par_logement": 4348.054195871347,
+    "cout_total_an": 5217665.035045616,
+    "cout_transport_an": 1217665.0350456163,
+    "couts_fixes_an": 4000000.0,
+    "co2_t_an": 584.5313148292408,
+    "distance_moyenne_km": 692.9597035930135,
+    "delai_moyen_h": 9.322067295491767,
+    "km_an": 584531.3148292408,
+    "satellites_utilises": [
+     "Cherbourg",
+     "Dunkerque"
+    ],
+    "part_directe": 0
+   },
+   "bascule": 900
+  },
+  "hybride": {
+   "A": {
+    "cout_par_logement": 5501.187028008269,
+    "cout_total_an": 6601424.433609923,
+    "cout_transport_an": 6601424.433609923,
+    "couts_fixes_an": 0.0,
+    "co2_t_an": 1941.5954216499774,
+    "distance_moyenne_km": 674.1650769617977,
+    "delai_moyen_h": 11.236084616029961,
+    "km_an": 1941595.4216499773,
+    "satellites_utilises": [],
+    "part_directe": 1.0
+   },
+   "B": {
+    "cout_par_logement": 4348.054195871347,
+    "cout_total_an": 5217665.035045616,
+    "cout_transport_an": 1217665.0350456163,
+    "couts_fixes_an": 4000000.0,
+    "co2_t_an": 584.5313148292408,
+    "distance_moyenne_km": 692.9597035930135,
+    "delai_moyen_h": 9.322067295491767,
+    "km_an": 584531.3148292408,
+    "satellites_utilises": [
+     "Cherbourg",
+     "Dunkerque"
+    ],
+    "part_directe": 0
+   },
+   "bascule": 900
+  },
+  "distances": {
+   "Gravelines": 650.3357491129333,
+   "Flamanville": 729.7668419424816
+  }
+ },
+ "classique": {
+  "proche": {
+   "A": {
+    "cout_par_logement": 1229.6481732128132,
+    "cout_total_an": 368894.45196384395,
+    "cout_transport_an": 368894.45196384395,
+    "couts_fixes_an": 0.0,
+    "co2_t_an": 108.49836822466001,
+    "distance_moyenne_km": 150.69217808980557,
+    "delai_moyen_h": 2.5115363014967595,
+    "km_an": 108498.36822466001,
+    "satellites_utilises": [],
+    "part_directe": 1.0
+   },
+   "B": {
+    "cout_par_logement": 7009.342179794475,
+    "cout_total_an": 2102802.6539383424,
+    "cout_transport_an": 102802.65393834245,
+    "couts_fixes_an": 2000000.0,
+    "co2_t_an": 44.43473754324526,
+    "distance_moyenne_km": 184.6385222349716,
+    "delai_moyen_h": 2.5185650267322646,
+    "km_an": 44434.73754324526,
+    "satellites_utilises": [
+     "Lyon-Sud"
+    ],
+    "part_directe": 0
+   },
+   "bascule": 2300
+  },
+  "hybride": {
+   "A": {
+    "cout_par_logement": 1229.6481732128132,
+    "cout_total_an": 368894.45196384395,
+    "cout_transport_an": 368894.45196384395,
+    "couts_fixes_an": 0.0,
+    "co2_t_an": 108.49836822466001,
+    "distance_moyenne_km": 150.69217808980557,
+    "delai_moyen_h": 2.5115363014967595,
+    "km_an": 108498.36822466001,
+    "satellites_utilises": [],
+    "part_directe": 1.0
+   },
+   "B": {
+    "cout_par_logement": 7009.342179794475,
+    "cout_total_an": 2102802.6539383424,
+    "cout_transport_an": 102802.65393834245,
+    "couts_fixes_an": 2000000.0,
+    "co2_t_an": 44.43473754324526,
+    "distance_moyenne_km": 184.6385222349716,
+    "delai_moyen_h": 2.5185650267322646,
+    "km_an": 44434.73754324526,
+    "satellites_utilises": [
+     "Lyon-Sud"
+    ],
+    "part_directe": 0
+   },
+   "bascule": 2300
+  },
+  "distances": {
+   "Lyon": 150.69217808980557
+  }
+ },
+ "national": {
+  "proche": {
+   "A": {
+    "cout_par_logement": 3082.63784890786,
+    "co2_t_an": 1359.9872862828793,
+    "delai_moyen_h": 6.296237436494812
+   },
+   "B": {
+    "cout_par_logement": 5794.831388884143,
+    "co2_t_an": 913.3246007395791,
+    "delai_moyen_h": 6.7780864798952996
+   },
+   "bascule": 4700
+  },
+  "hybride": {
+   "A": {
+    "cout_par_logement": 3082.63784890786,
+    "co2_t_an": 1359.9872862828793,
+    "delai_moyen_h": 6.296237436494812
+   },
+   "B": {
+    "cout_par_logement": 5605.759829403721,
+    "co2_t_an": 813.3420176887745,
+    "delai_moyen_h": 5.967466847548352
+   },
+   "bascule": 4100
+  }
+ },
+ "dimensionnement": {
+  "logements_an": 1500,
+  "schema": "unique",
+  "tonnes_jour": 81.81818181818181,
+  "camions_entrants_jour": 5.844155844155844,
+  "quais_reception": 2,
+  "unites_expediees_jour": 8.181818181818182,
+  "camions_sortants_jour": 8.181818181818182,
+  "quais_expedition": 2,
+  "surfaces": {
+   "stock_matieres": 2045.4545454545453,
+   "stock_pf": 2147.7272727272725,
+   "production": 11200.0,
+   "kitting": 300.0,
+   "voiries": 5670.929158456675,
+   "bureaux": 1500
+  },
+  "besoin_total": 22864.110976638494,
+  "utilisable_site_seul": 25671.6,
+  "utilisable_avec_extension": 42137.4,
+  "m2_stockage_pour_1000": 2795.4545454545455
+ },
+ "cadence": {
+  "logements_an": 1500,
+  "logements_jour": 6.818181818181818,
+  "modules_jour": 8.181818181818182,
+  "pods_jour": 6.818181818181818,
+  "panneaux_jour": 98.18181818181819,
+  "temps_ouverture_min": 960,
+  "temps_net_min": 768.0,
+  "takt_module_min": 93.86666666666667,
+  "takt_pod_min": 112.64,
+  "ressources": {
+   "baies_assemblage": {
+    "libelle": "Baies d'assemblage 3D",
+    "cycle_min": 960,
+    "takt_min": 93.86666666666667,
+    "nombre": 12,
+    "charge": 0.8522727272727272
+   },
+   "lignes_2d": {
+    "libelle": "Lignes 2D robotisées",
+    "cycle_min": 70,
+    "takt_min": 93.86666666666667,
+    "nombre": 1,
+    "charge": 0.7457386363636364
+   },
+   "lignes_pods": {
+    "libelle": "Lignes pods",
+    "cycle_min": 75,
+    "takt_min": 112.64,
+    "nombre": 1,
+    "charge": 0.6658380681818182
+   },
+   "postes_kitting": {
+    "libelle": "Postes de kitting",
+    "cycle_min": 25,
+    "takt_min": 93.86666666666667,
+    "nombre": 1,
+    "charge": 0.26633522727272724
+   }
+  },
+  "postes_pods": 4,
+  "goulot": "baies_assemblage"
+ }
+}

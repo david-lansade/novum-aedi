@@ -1,0 +1,59 @@
+# Tests intégrés du projet : modèle, simulation, jumeau, scène 3D, application de scan (Python)
+# et vue 3D (Node). Les tests d'interface Tkinter (tests_interface.py) se lancent à la main sous
+# Windows : ils ouvrent réellement la fenêtre.
+
+name: Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Dépendances
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r avelis_flux/requirements.txt "qrcode[pil]" flake8
+    - name: Erreurs de syntaxe et noms non définis
+      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=node_modules
+    - name: Modèle
+      run: python avelis_flux/modele.py
+    - name: Simulation
+      run: python avelis_flux/simulation.py
+    - name: Jumeau numérique, analyse et décisions
+      run: |
+        python avelis_flux/jumeau.py
+        python avelis_flux/analyse_jumeau.py
+        python avelis_flux/decisions.py
+    - name: Scène 3D et serveur local
+      run: python avelis_flux/scene_3d.py
+    - name: Application de scan
+      run: python avelis_scan/tests_scan.py
+
+  vue-3d:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: avelis_3d
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+        cache: npm
+        cache-dependency-path: avelis_3d/package-lock.json
+    - run: npm ci
+    - run: npm test

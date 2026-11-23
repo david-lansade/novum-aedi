@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F2A44">
+<title>Scan atelier</title>
+<style>
+  :root {
+    --fond: #F2F4F8; --carte: #FFFFFF; --texte: #1C2230; --doux: #667085; --bord: #DDE2EA;
+    --marine: #1F2A44; --orange: #F28C38; --vert: #1F9D55; --rouge: #D92D20; --ambre: #B54708;
+    --bleu: #2F6FDE; --vert-f: #E7F6EE; --rouge-f: #FDECEA; --ambre-f: #FFF4E5; --bleu-f: #EAF1FD;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --fond: #0F141C; --carte: #18202C; --texte: #E8ECF2; --doux: #98A2B3; --bord: #2A3443;
+      --vert-f: #12301F; --rouge-f: #3A1714; --ambre-f: #3A2A12; --bleu-f: #15253F; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--fond);
+         color: var(--texte); font-size: 16px; -webkit-tap-highlight-color: transparent; }
+  header { position: sticky; top: 0; z-index: 5; background: var(--marine); color: #fff; padding: 10px 14px;
+           display: flex; align-items: center; gap: 10px; }
+  header .poste { flex: 1; min-width: 0; }
+  header .poste b { display: block; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header .poste span { font-size: 12px; opacity: .75; }
+  header button { background: rgba(255,255,255,.14); color: #fff; border: 0; border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+  .pastille { width: 10px; height: 10px; border-radius: 50%; background: #9AA0AA; flex: none; }
+  .pastille.ok { background: #3DDC84; } .pastille.ko { background: #FF5A4F; }
+  main { padding: 12px 12px 90px; max-width: 640px; margin: 0 auto; }
+  .bloc { background: var(--carte); border: 1px solid var(--bord); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  h2 { font-size: 15px; margin: 0 0 8px; color: var(--doux); text-transform: uppercase; letter-spacing: .04em; }
+  .saisie { display: flex; gap: 8px; }
+  input, select, textarea { font: inherit; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--bord);
+                            background: var(--carte); color: var(--texte); }
+  textarea { min-height: 70px; }
+  button.gros { width: 100%; font: inherit; font-weight: 600; padding: 15px; border-radius: 12px; border: 0; margin-top: 8px;
+                background: var(--bleu); color: #fff; }
+  button.gros.principal { background: var(--vert); font-size: 18px; padding: 18px; }
+  button.gros.danger { background: transparent; color: var(--rouge); border: 2px solid var(--rouge); }
+  button.gros.force { background: transparent; color: var(--doux); border: 2px dashed var(--doux); }
+  button.gros.scan { background: var(--orange); font-size: 19px; padding: 20px; }
+  button.gros.nfc { background: var(--marine); }
+  button.gros.nfc.actif { background: var(--vert); }
+  @media (prefers-color-scheme: dark) { button.gros.nfc { background: #33476F; } }
+  button.ok-btn { font: inherit; padding: 12px 16px; border-radius: 10px; border: 0; background: var(--marine); color: #fff; font-weight: 600; }
+  .astuce { font-size: 13px; color: var(--doux); margin-top: 8px; line-height: 1.4; }
+  .consigne { border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; gap: 10px; align-items: flex-start;
+              background: var(--ambre-f); border-left: 5px solid var(--ambre); }
+  .consigne.blocage, .consigne.retard, .consigne.defaut { background: var(--rouge-f); border-color: var(--rouge); }
+  .consigne.kanban { background: var(--bleu-f); border-color: var(--bleu); }
+  .consigne p { margin: 0; flex: 1; font-size: 15px; }
+  .consigne small { display: block; color: var(--doux); margin-top: 3px; }
+  .consigne button { border: 0; border-radius: 8px; padding: 8px 12px; background: var(--carte); color: var(--texte);
+                     font-weight: 600; border: 1px solid var(--bord); }
+  .message { border-radius: 12px; padding: 14px; margin-bottom: 12px; font-weight: 600; line-height: 1.35; }
+  .message.ok { background: var(--vert-f); color: var(--vert); border: 2px solid var(--vert); }
+  .message.attention { background: var(--ambre-f); color: var(--ambre); border: 2px solid var(--ambre); }
+  .message.refus { background: var(--rouge-f); color: var(--rouge); border: 2px solid var(--rouge); }
+  .message.info { background: var(--bleu-f); color: var(--bleu); border: 2px solid var(--bleu); }
+  .entete { display: flex; justify-content: space-between; gap: 6px 8px; align-items: flex-start; flex-wrap: wrap; }
+  .code { font-size: 22px; font-weight: 800; letter-spacing: .02em; white-space: nowrap; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap;
+           background: var(--bleu-f); color: var(--bleu); }
+  .badge.defaut, .badge.rebut, .badge.bloque, .badge.vide { background: var(--rouge-f); color: var(--rouge); }
+  .badge.integree, .badge.expediee, .badge.terminee, .badge.en_stock, .badge.pleine { background: var(--vert-f); color: var(--vert); }
+  .badge.creee, .badge.en_preparation { background: var(--ambre-f); color: var(--ambre); }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 12px 0 0; font-size: 15px; }
+  dt { color: var(--doux); } dd { margin: 0; font-weight: 600; word-break: break-word; }
+  details { border-top: 1px solid var(--bord); padding: 10px 0 0; margin-top: 10px; }
+  summary { font-weight: 700; cursor: pointer; padding: 4px 0; }
+  ul.liste { list-style: none; padding: 0; margin: 8px 0 0; font-size: 14px; }
+  ul.liste li { padding: 7px 0; border-bottom: 1px solid var(--bord); display: flex; justify-content: space-between; gap: 8px; }
+  ul.liste li:last-child { border-bottom: 0; }
+  .fait { color: var(--vert); font-weight: 700; } .afaire { color: var(--doux); } .courant { color: var(--orange); font-weight: 700; }
+  .refuse { color: var(--rouge); }
+  .postes button { display: block; width: 100%; text-align: left; font: inherit; padding: 14px; margin-bottom: 8px; border-radius: 12px;
+                   border: 1px solid var(--bord); background: var(--carte); color: var(--texte); }
+  .postes button.choisi { border: 2px solid var(--orange); font-weight: 700; }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 20; display: none; align-items: flex-end; justify-content: center; }
+  .modal.ouvert { display: flex; }
+  .modal .boite { background: var(--carte); width: 100%; max-width: 640px; max-height: 92vh; overflow: auto;
+                  border-radius: 18px 18px 0 0; padding: 18px 16px 26px; }
+  .modal label { display: block; font-size: 14px; color: var(--doux); margin: 12px 0 4px; }
+  #camera video { width: 100%; border-radius: 12px; background: #000; }
+  .cache { display: none !important; }
+  .ligne2 { display: flex; gap: 8px; } .ligne2 > * { flex: 1; }
+</style>
+</head>
+<body>
+<header>
+  <span class="pastille" id="pastille" title="Connexion au serveur"></span>
+  <div class="poste"><b id="h-poste">Choisir un poste</b><span id="h-op">—</span></div>
+  <button id="b-reglages">Poste</button>
+</header>
+
+<main>
+  <!-- Réglages : poste et opérateur -->
+  <section id="reglages" class="bloc cache">
+    <h2>Votre poste</h2>
+    <div class="postes" id="liste-postes"></div>
+    <h2 style="margin-top:14px">Code opérateur</h2>
+    <input id="operateur" placeholder="ex. OP-01" autocomplete="off" autocapitalize="characters">
+    <button class="gros principal" id="b-valider-reglages">Valider</button>
+  </section>
+
+  <!-- Consignes reçues pour ce poste -->
+  <section id="consignes"></section>
+
+  <!-- Scan -->
+  <section id="zone-scan" class="bloc">
+    <button class="gros scan" id="b-camera">Scanner une étiquette</button>
+    <button class="gros nfc" id="b-nfc">Lire une puce NFC</button>
+    <div class="astuce cache" id="nfc-etat"></div>
+    <div id="camera" class="cache" style="margin-top:10px">
+      <video id="video" playsinline muted></video>
+      <button class="gros force" id="b-fermer-camera">Fermer la caméra</button>
+    </div>
+    <div class="saisie" style="margin-top:10px">
+      <input id="code" placeholder="ou saisir le code (MOD-29-00001, KB-001…)" autocomplete="off" autocapitalize="characters">
+      <button class="ok-btn" id="b-ok">OK</button>
+    </div>
+    <div class="astuce" id="astuce-camera"></div>
+  </section>
+
+  <div id="message"></div>
+  <section id="resultat"></section>
+</main>
+
+<!-- Formulaire d'action (défaut, intégration, expédition, forçage) -->
+<div class="modal" id="modal"><div class="boite" id="modal-boite"></div></div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const etat = { config: null, poste: "", operateur: "", objet: null, consignesVues: new Set(), premier: true,
+               moyen: "" };  // moyen d'identification de la pièce affichée : qr, nfc ou saisie
+
+function lire(cle) { try { return localStorage.getItem(cle) || ""; } catch (e) { return ""; } }
+function ecrire(cle, v) { try { localStorage.setItem(cle, v); } catch (e) { /* stockage indisponible */ } }
+function echapper(t) { return String(t ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function heure(t) { return t ? new Date(t * 1000).toLocaleTimeString("fr-FR", {hour: "2-digit", minute: "2-digit", second: "2-digit"}) : ""; }
+function duree(s) {
+  if (s == null) return "—";
+  s = Math.round(s);
+  if (s < 60) return s + " s";
+  const m = Math.floor(s / 60), h = Math.floor(m / 60);
+  return h ? `${h} h ${String(m % 60).padStart(2, "0")}` : `${m} min ${String(s % 60).padStart(2, "0")}`;
+}
+function vibrer(motif) { try { navigator.vibrate && navigator.vibrate(motif); } catch (e) {} }
+
+async function api(chemin, corps) {
+  const options = corps ? {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(corps)} : {};
+  const r = await fetch(chemin, options);
+  const d = await r.json();
+  $("pastille").className = "pastille ok";
+  if (!r.ok) throw new Error(d.erreur || "Erreur");
+  return d;
+}
+
+// ───────────────────────────────────────────── réglages
+function afficherReglages(visible) {
+  $("reglages").classList.toggle("cache", !visible);
+  $("zone-scan").classList.toggle("cache", visible);
+  const liste = $("liste-postes");
+  liste.innerHTML = "";
+  for (const p of etat.config.postes) {
+    const b = document.createElement("button");
+    b.textContent = p.nom;
+    b.className = p.id === etat.poste ? "choisi" : "";
+    b.onclick = () => { etat.poste = p.id; afficherReglages(true); };
+    liste.appendChild(b);
+  }
+  $("operateur").value = etat.operateur;
+}
+function majEntete() {
+  const p = etat.config.postes.find((x) => x.id === etat.poste);
+  $("h-poste").textContent = p ? p.nom : "Choisir un poste";
+  $("h-op").textContent = etat.operateur ? "Opérateur " + etat.operateur : "Opérateur non renseigné";
+}
+$("b-reglages").onclick = () => afficherReglages($("reglages").classList.contains("cache"));
+$("b-valider-reglages").onclick = () => {
+  if (!etat.poste) { alert("Choisissez votre poste."); return; }
+  etat.operateur = $("operateur").value.trim().toUpperCase();
+  ecrire("poste", etat.poste); ecrire("operateur", etat.operateur);
+  afficherReglages(false); majEntete(); chargerConsignes();
+  if (etat.objet) charger(etat.objet.code);
+};
+
+// ───────────────────────────────────────────── consignes (retour vers le terrain)
+async function chargerConsignes() {
+  if (!etat.poste) return;
+  try {
+    const liste = await api("/api/consignes?poste=" + encodeURIComponent(etat.poste));
+    let nouvelle = false;
+    $("consignes").innerHTML = liste.map((c) => {
+      if (!etat.consignesVues.has(c.id)) { nouvelle = !etat.premier; etat.consignesVues.add(c.id); }
+      return `<div class="consigne ${echapper(c.type)}"><p>${echapper(c.message)}<small>${heure(c.t)} · ${echapper(c.poste_nom)}</small></p>
+              <button onclick="acquitter(${c.id})">Vu</button></div>`;
+    }).join("");
+    if (nouvelle) vibrer([200, 100, 200]);
+    etat.premier = false;
+  } catch (e) { $("pastille").className = "pastille ko"; }
+}
+async function acquitter(id) {
+  await api(`/api/consignes/${id}/acquitter`, {operateur: etat.operateur});
+  chargerConsignes();
+}
+
+// ───────────────────────────────────────────── scan et affichage
+function normaliser(texte) {
+  texte = (texte || "").trim();
+  const m = texte.match(/\/s\/([^/?#\s]+)/);
+  if (m) texte = decodeURIComponent(m[1]);
+  if (texte.toUpperCase().startsWith("AVELIS|")) texte = texte.split("|")[1];
+  return texte.trim().toUpperCase();
+}
+async function charger(code, moyen = "saisie") {
+  code = normaliser(code);
+  if (!code) return;
+  etat.moyen = moyen;
+  if (!etat.poste) { afficherReglages(true); return; }
+  $("message").innerHTML = "";
+  try {
+    const o = await api(`/api/objet/${encodeURIComponent(code)}?poste=${encodeURIComponent(etat.poste)}`);
+    etat.objet = o;
+    afficherObjet(o);
+  } catch (e) { afficherMessage("refus", e.message); }
+}
+function afficherMessage(niveau, texte) {
+  $("message").innerHTML = texte ? `<div class="message ${niveau}">${echapper(texte)}</div>` : "";
+  if (niveau === "refus") vibrer([300, 100, 300]); else if (niveau === "ok") vibrer(80);
+}
+
+function boutonsActions(actions) {
+  return actions.map((a, i) => {
+    const cls = a.principal ? "principal" : a.danger ? "danger" : a.force ? "force" : "";
+    return `<button class="gros ${cls}" onclick="lancerAction(${i})">${echapper(a.libelle)}</button>`;
+  }).join("");
+}
+
+function afficherObjet(o) {
+  const r = $("resultat");
+  if (o.genre === "inconnu") {
+    afficherMessage("info", `Code ${o.code} inconnu dans la base.`);
+    r.innerHTML = `<div class="bloc"><div class="code">${echapper(o.code)}</div>
+      <p>Cette pièce n'existe pas encore. Vous pouvez la créer maintenant.</p>
+      <button class="gros" onclick="formCreation()">Créer cette pièce</button></div>`;
+    return;
+  }
+  if (o.genre === "carte") return afficherCarte(o);
+  const p = o.piece;
+  const statut = o.lot_bloque ? "bloque" : p.statut;
+  const libStatut = o.lot_bloque ? "Lot bloqué" : o.statut_libelle;
+  if (o.message && !$("message").innerHTML) afficherMessage(o.lot_bloque ? "refus" : "info", o.message);
+  const sejourEnCours = o.sejours.find((s) => s.en_cours);
+  r.innerHTML = `<div class="bloc">
+    <div class="entete"><div><div class="code">${echapper(p.code)}</div><div style="color:var(--doux)">${echapper(o.type_libelle)}</div></div>
+      <span class="badge ${statut}">${echapper(libStatut)}</span></div>
+    <dl>
+      <dt>Désignation</dt><dd>${echapper(p.designation)}</dd>
+      <dt>Poste actuel</dt><dd>${p.poste ? echapper(o.poste_nom) + (sejourEnCours ? " · depuis " + duree(sejourEnCours.duree_s) : "") : "pas encore scannée"}</dd>
+      <dt>Prochaine étape</dt><dd>${o.prochaine ? echapper(o.prochaine.etape) + " → " + echapper(o.prochaine.poste_nom) : "—"}</dd>
+      <dt>Vient de</dt><dd>${echapper(p.origine || "—")}</dd>
+      <dt>Va vers</dt><dd>${echapper(p.destination || "—")}</dd>
+      ${p.lot ? `<dt>Lot</dt><dd>${echapper(p.lot)}${o.lot_info ? " · " + echapper(o.lot_info.fournisseur) : ""}${o.lot_bloque ? ' <span class="badge bloque">BLOQUÉ</span>' : ""}</dd>` : ""}
+      ${p.parent ? `<dt>Module</dt><dd>${echapper(p.parent)}</dd>` : ""}
+      ${p.numero_serie ? `<dt>N° de série</dt><dd>${echapper(p.numero_serie)}</dd>` : ""}
+    </dl>
+    ${boutonsActions(o.actions)}
+    ${boutonEcritureNfc(p.code)}
+    <details ${o.sejours.length ? "" : ""}><summary>Gamme (${o.gamme.filter((g) => g.faite).length}/${o.gamme.length})</summary>
+      <ul class="liste">${o.gamme.map((g) => {
+        const courant = o.prochaine && g.etape === o.prochaine.etape && !g.faite;
+        return `<li><span class="${g.faite ? "fait" : courant ? "courant" : "afaire"}">${g.faite ? "✓" : courant ? "▶" : "○"} ${echapper(g.etape)}</span><span class="afaire">${echapper(g.poste_nom)}</span></li>`;
+      }).join("")}</ul></details>
+    <details><summary>Temps passé à chaque poste</summary>
+      <ul class="liste">${o.sejours.length ? o.sejours.map((s) => `<li><span>${echapper(s.poste_nom)}${s.en_cours ? " (en cours)" : ""}</span><b>${duree(s.duree_s)}</b></li>`).join("") : "<li>Aucun passage enregistré</li>"}</ul></details>
+    ${o.enfants.length ? `<details><summary>Composants du module (${o.enfants.filter((e) => e.statut === "integree").length}/${o.enfants.length} intégrés)</summary>
+      <ul class="liste">${o.enfants.map((e) => `<li><a href="#" onclick="charger('${echapper(e.code)}');return false">${echapper(e.code)}</a><span class="badge ${e.statut}">${echapper(e.statut)}</span></li>`).join("")}</ul></details>` : ""}
+    ${o.defauts.length ? `<details open><summary>Défauts (${o.defauts.length})</summary>
+      <ul class="liste">${o.defauts.map((d) => `<li><span>${heure(d.t)} · ${echapper(d.categorie)} – ${echapper(d.cause)}${d.description ? " – " + echapper(d.description) : ""}</span><span class="badge ${d.statut === "ouvert" ? "defaut" : "terminee"}">${echapper(d.statut)}</span></li>`).join("")}</ul></details>` : ""}
+    <details><summary>Historique (${o.evenements.length})</summary>
+      <ul class="liste">${o.evenements.map((e) => `<li><span class="${e.resultat === "refuse" ? "refuse" : ""}">${heure(e.t)} · ${echapper(e.evenement)}${e.message ? " – " + echapper(e.message) : ""}${e.moyen === "nfc" ? " · NFC" : ""}</span><span class="afaire">${echapper(e.operateur)}</span></li>`).join("")}</ul></details>
+  </div>`;
+}
+
+function afficherCarte(o) {
+  const c = o.carte;
+  const libelles = {pleine: "Bac plein", vide: "Bac vide · à préparer", en_preparation: "Bac en route"};
+  if (o.message && !$("message").innerHTML) afficherMessage("info", o.message);
+  const attente = o.demande && !o.demande.t_livre ? (Date.now() / 1000 - o.demande.t_vide) : null;
+  $("resultat").innerHTML = `<div class="bloc">
+    <div class="entete"><div><div class="code">${echapper(c.code)}</div><div style="color:var(--doux)">Carte kanban</div></div>
+      <span class="badge ${c.etat}">${libelles[c.etat] || c.etat}</span></div>
+    <dl>
+      <dt>Article</dt><dd>${c.quantite} × ${echapper(c.designation)}</dd>
+      <dt>Référence</dt><dd>${echapper(c.reference)}</dd>
+      <dt>Poste consommateur</dt><dd>${echapper(o.poste_nom)}</dd>
+      <dt>Source</dt><dd>${echapper(c.source)}</dd>
+      <dt>Délai cible</dt><dd>${c.delai_min} min</dd>
+      ${attente != null ? `<dt>Attente</dt><dd>${duree(attente)}${attente / 60 > c.delai_min ? ' <span class="badge vide">EN RETARD</span>' : ""}</dd>` : ""}
+      <dt>Cycles réalisés</dt><dd>${c.cycles}</dd>
+    </dl>
+    ${boutonsActions(o.actions)}
+    ${boutonEcritureNfc(c.code)}
+    <details><summary>Dernières demandes</summary><ul class="liste">${o.historique.map((d) =>
+      `<li><span>${heure(d.t_vide)} → ${d.t_livre ? heure(d.t_livre) : "en cours"}</span><b class="${d.en_retard ? "refuse" : ""}">${d.t_livre ? duree(d.t_livre - d.t_vide) : ""}</b></li>`).join("") || "<li>Aucune</li>"}</ul></details>
+  </div>`;
+}
+
+// ───────────────────────────────────────────── actions
+function champHtml(c) {
+  if (c.choix) return `<label>${echapper(c.libelle)}</label><select data-nom="${c.nom}">${c.choix.map((x) => `<option ${x === c.valeur ? "selected" : ""}>${echapper(x)}</option>`).join("")}</select>`;
+  return `<label>${echapper(c.libelle)}</label><input data-nom="${c.nom}" value="${echapper(c.valeur || "")}" autocapitalize="characters">`;
+}
+function ouvrirModal(html) { $("modal-boite").innerHTML = html; $("modal").classList.add("ouvert"); }
+function fermerModal() {
+  if (annulationEcritureNfc) { annulationEcritureNfc.abort(); annulationEcritureNfc = null; }  // écriture NFC abandonnée
+  $("modal").classList.remove("ouvert");
+}
+$("modal").onclick = (e) => { if (e.target.id === "modal") fermerModal(); };
+
+function lancerAction(i) {
+  const a = etat.objet.actions[i];
+  if (a.id === "defaut") {
+    const k = etat.config;
+    return ouvrirModal(`<h2>Défaut sur ${echapper(etat.objet.code)}</h2>
+      <label>Catégorie</label><select data-nom="categorie">${k.categories_defaut.map((x) => `<option>${echapper(x)}</option>`).join("")}</select>
+      <label>Cause présumée</label><select data-nom="cause">${k.causes_defaut.map((x) => `<option>${echapper(x)}</option>`).join("")}</select>
+      <label>Gravité</label><select data-nom="gravite">${k.gravites.map((x) => `<option>${echapper(x)}</option>`).join("")}</select>
+      <label>Description</label><textarea data-nom="description" placeholder="Ce qui a été constaté"></textarea>
+      <div class="astuce">Cause « Matière / lot fournisseur » : tout le lot est bloqué et les postes concernés sont prévenus.</div>
+      <button class="gros danger" onclick="envoyerModal('defaut')">Enregistrer le défaut</button>
+      <button class="gros force" onclick="fermerModal()">Annuler</button>`);
+  }
+  if (a.id === "rebut") {
+    return ouvrirModal(`<h2>Mettre ${echapper(etat.objet.code)} au rebut ?</h2>
+      <label>Motif</label><input data-nom="motif">
+      <button class="gros danger" onclick="envoyerModal('rebut')">Confirmer le rebut</button>
+      <button class="gros force" onclick="fermerModal()">Annuler</button>`);
+  }
+  if (a.champs && a.champs.length) {
+    return ouvrirModal(`<h2>${echapper(a.libelle)}</h2>${a.champs.map(champHtml).join("")}
+      <button class="gros principal" onclick="envoyerModal('${a.id}', ${a.force ? "true" : "false"})">Valider</button>
+      <button class="gros force" onclick="fermerModal()">Annuler</button>`);
+  }
+  envoyer(a.id, {});
+}
+function envoyerModal(action, force) {
+  const params = {};
+  document.querySelectorAll("#modal-boite [data-nom]").forEach((el) => { params[el.dataset.nom] = el.value; });
+  if (force) params.force = true;
+  fermerModal();
+  envoyer(action, params);
+}
+async function envoyer(action, params) {
+  try {
+    const r = await api("/api/scan", {code: etat.objet.code, poste: etat.poste, operateur: etat.operateur,
+                                       action, params, t_client: Date.now() / 1000, moyen: etat.moyen});
+    afficherMessage(r.niveau, r.message);
+    if (r.objet) { etat.objet = r.objet; afficherObjet(r.objet); }
+    chargerConsignes();
+    window.scrollTo({top: 0, behavior: "smooth"});
+  } catch (e) { afficherMessage("refus", e.message); }
+}
+
+function formCreation() {
+  const k = etat.config, code = etat.objet.code, devine = etat.objet.type_devine;
+  const types = Object.entries(k.types).map(([id, t]) => `<option value="${id}" ${id === devine ? "selected" : ""}>${echapper(t.libelle)}</option>`).join("");
+  ouvrirModal(`<h2>Nouvelle pièce ${echapper(code)}</h2>
+    <label>Type</label><select data-nom="type_piece">${types}</select>
+    <label>Désignation</label><input data-nom="designation">
+    <label>Lot (facultatif)</label><input data-nom="lot" autocapitalize="characters">
+    <label>Fournisseur (pièce achetée)</label><select data-nom="fournisseur"><option value="">—</option>${Object.entries(k.fournisseurs).map(([c, n]) => `<option value="${c}">${c} · ${echapper(n)}</option>`).join("")}</select>
+    <label>Module parent (facultatif)</label><input data-nom="parent" autocapitalize="characters">
+    <label>Destination (chantier, facultatif)</label><input data-nom="destination">
+    <button class="gros principal" onclick="creer()">Créer</button>
+    <button class="gros force" onclick="fermerModal()">Annuler</button>`);
+}
+async function creer() {
+  const d = {code: etat.objet.code, operateur: etat.operateur};
+  document.querySelectorAll("#modal-boite [data-nom]").forEach((el) => { if (el.value) d[el.dataset.nom] = el.value; });
+  fermerModal();
+  try { await api("/api/pieces", d); afficherMessage("ok", `Pièce ${d.code} créée.`); charger(d.code); }
+  catch (e) { afficherMessage("refus", e.message); }
+}
+
+// ───────────────────────────────────────────── caméra (si le navigateur l'autorise)
+let flux = null, minuteur = null;
+const cameraPossible = window.isSecureContext && "BarcodeDetector" in window && navigator.mediaDevices;
+async function ouvrirCamera() {
+  if (!cameraPossible) {
+    $("astuce-camera").innerHTML = `<b>Scan intégré indisponible sur cette connexion (http).</b><br>
+      Utilisez l'appareil photo du téléphone (ou Google Lens) : l'étiquette ouvre directement cette page.<br>
+      Pour scanner ici : Chrome → <code>chrome://flags</code> → « Insecure origins treated as secure » → ajouter
+      <code>${echapper(location.origin)}</code> → Enable → Relancer.`;
+    return;
+  }
+  try {
+    const detecteur = new BarcodeDetector({formats: ["qr_code"]});
+    flux = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}});
+    $("video").srcObject = flux; await $("video").play();
+    $("camera").classList.remove("cache"); $("b-camera").classList.add("cache");
+    minuteur = setInterval(async () => {
+      try {
+        const codes = await detecteur.detect($("video"));
+        if (codes.length) { fermerCamera(); vibrer(60); $("message").innerHTML = ""; charger(codes[0].rawValue, "qr"); }
+      } catch (e) {}
+    }, 250);
+  } catch (e) { $("astuce-camera").textContent = "Caméra refusée : " + e.message; }
+}
+function fermerCamera() {
+  clearInterval(minuteur);
+  if (flux) flux.getTracks().forEach((t) => t.stop());
+  flux = null;
+  $("camera").classList.add("cache"); $("b-camera").classList.remove("cache");
+}
+// ───────────────────────────────────────────── puces NFC (Web NFC : Chrome sur Android)
+// Une puce contient les mêmes informations qu'une étiquette QR : l'adresse de scan de la pièce
+// (enregistrement « url », que le téléphone ouvre seul) et le code en clair (« text »).
+const nfcPossible = window.isSecureContext && "NDEFReader" in window;
+let lecteurNfc = null, arretLectureNfc = null, annulationEcritureNfc = null, ecritureNfcEnCours = false;
+
+function expliquerNfc() {
+  afficherMessage("info", "NFC indisponible ici : il faut Chrome sur Android, le NFC activé dans les réglages du téléphone et, "
+    + "sur une adresse http, le même réglage que pour la caméra (chrome://flags → « Insecure origins treated as secure »). "
+    + "Sans cela, touchez la puce avec le téléphone déverrouillé : elle ouvre directement la fiche.");
+}
+function texteEnregistrement(enregistrement) {
+  if (!enregistrement.data) return "";
+  return new TextDecoder(enregistrement.encoding || "utf-8").decode(enregistrement.data);
+}
+function codeDepuisNfc(message) {
+  for (const e of message.records) {
+    if (["url", "absolute-url", "text"].includes(e.recordType)) {
+      const code = normaliser(texteEnregistrement(e));
+      if (code) return code;
+    }
+  }
+  return "";
+}
+function etatLectureNfc(active) {
+  $("b-nfc").textContent = active ? "Arrêter la lecture NFC" : "Lire une puce NFC";
+  $("b-nfc").classList.toggle("actif", active);
+  $("nfc-etat").textContent = active ? "NFC actif : approchez une puce du dos du téléphone." : "";
+  $("nfc-etat").classList.toggle("cache", !active);
+}
+function arreterNfc() {
+  if (arretLectureNfc) arretLectureNfc.abort();
+  lecteurNfc = null; arretLectureNfc = null;
+  etatLectureNfc(false);
+}
+async function lireNfc() {
+  if (!nfcPossible) return expliquerNfc();
+  if (lecteurNfc) return arreterNfc();
+  try {
+    lecteurNfc = new NDEFReader();
+    arretLectureNfc = new AbortController();
+    lecteurNfc.onreading = (evt) => {
+      if (ecritureNfcEnCours) return;  // la puce qu'on est en train d'écrire
+      const code = codeDepuisNfc(evt.message);
+      if (!code) { afficherMessage("refus", "Puce NFC vide : aucun code. Écrivez-la depuis la fiche d'une pièce."); return; }
+      vibrer(60); $("message").innerHTML = ""; charger(code, "nfc");
+    };
+    lecteurNfc.onreadingerror = () => afficherMessage("refus", "Puce NFC illisible : tenez-la à plat contre le dos du téléphone.");
+    await lecteurNfc.scan({signal: arretLectureNfc.signal});
+    etatLectureNfc(true);
+  } catch (e) {
+    lecteurNfc = null; arretLectureNfc = null; etatLectureNfc(false);
+    afficherMessage("refus", "Lecture NFC impossible : " + e.message);
+  }
+}
+function boutonEcritureNfc(code) {
+  return `<button class="gros nfc" onclick="ecrireNfc('${echapper(code)}')">Écrire ce code sur une puce NFC</button>`;
+}
+async function ecrireNfc(code) {
+  if (!nfcPossible) return expliquerNfc();
+  annulationEcritureNfc = new AbortController();
+  ouvrirModal(`<h2>Écrire ${echapper(code)} sur une puce NFC</h2>
+    <p>Approchez une puce NFC (vierge ou réinscriptible) du dos du téléphone et gardez-la en place jusqu'à la vibration.</p>
+    <div class="astuce">La puce reçoit la même adresse que l'étiquette QR : la toucher avec un téléphone ouvre la fiche de la pièce.
+      Une puce déjà écrite est remplacée.</div>
+    <button class="gros force" onclick="fermerModal()">Annuler</button>`);
+  ecritureNfcEnCours = true;
+  try {
+    await new NDEFReader().write({records: [
+      {recordType: "url", data: `${location.origin}/s/${encodeURIComponent(code)}?m=nfc`},
+      {recordType: "text", data: code, lang: "fr"}]}, {overwrite: true, signal: annulationEcritureNfc.signal});
+    annulationEcritureNfc = null;
+    fermerModal(); vibrer([80, 60, 80]);
+    const r = await api("/api/nfc/ecriture", {code, poste: etat.poste, operateur: etat.operateur});
+    afficherMessage("ok", r.message);
+    rafraichir();
+  } catch (e) {
+    fermerModal();
+    if (e.name !== "AbortError") afficherMessage("refus", "Écriture NFC impossible : " + e.message);
+  } finally {
+    ecritureNfcEnCours = false; annulationEcritureNfc = null;
+  }
+}
+$("b-nfc").onclick = lireNfc;
+
+$("b-camera").onclick = ouvrirCamera;
+$("b-fermer-camera").onclick = fermerCamera;
+$("b-ok").onclick = () => { $("message").innerHTML = ""; charger($("code").value); $("code").value = ""; $("code").blur(); };
+$("code").addEventListener("keydown", (e) => { if (e.key === "Enter") $("b-ok").click(); });
+
+// ───────────────────────────────────────────── démarrage
+(async function demarrer() {
+  try { etat.config = await api("/api/config"); }
+  catch (e) { $("pastille").className = "pastille ko"; afficherMessage("refus", "Serveur injoignable. Vérifiez le wifi et que le serveur tourne sur le PC."); return; }
+  etat.poste = lire("poste"); etat.operateur = lire("operateur");
+  if (!etat.config.postes.some((p) => p.id === etat.poste)) etat.poste = "";
+  majEntete();
+  if (!cameraPossible) $("astuce-camera").textContent = "Astuce : scannez l'étiquette avec l'appareil photo du téléphone, "
+    + "ou touchez la puce NFC avec le téléphone : elle ouvre cette page.";
+  const m = location.pathname.match(/^\/s\/(.+)$/);
+  if (!etat.poste) afficherReglages(true);
+  // Page ouverte par une étiquette : QR (appareil photo) ou puce NFC touchée hors de l'application (?m=nfc)
+  const moyenLien = new URLSearchParams(location.search).get("m") === "nfc" ? "nfc" : "qr";
+  if (m) { etat.objet = {code: normaliser(decodeURIComponent(m[1]))}; history.replaceState(null, "", "/"); if (etat.poste) charger(etat.objet.code, moyenLien); }
+  chargerConsignes();
+  setInterval(chargerConsignes, 4000);
+  setInterval(() => { if (etat.objet && etat.objet.genre && !$("modal").classList.contains("ouvert")) rafraichir(); }, 15000);
+})();
+async function rafraichir() {
+  try { const o = await api(`/api/objet/${encodeURIComponent(etat.objet.code)}?poste=${encodeURIComponent(etat.poste)}`); etat.objet = o; afficherObjet(o); } catch (e) {}
+}
+</script>
+</body>
+</html>

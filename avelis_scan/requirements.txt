@@ -1,0 +1,1 @@
+qrcode>=7.4   # facultatif : etiquettes QR (le reste n utilise que la bibliotheque standard)

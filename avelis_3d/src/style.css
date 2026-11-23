@@ -1,0 +1,1405 @@
+/* Jetons de style de l'interface (cartes blanches arrondies, ombre douce, police Inter) ; la
+   palette « maquette » de la 3D est dans apparence.js : violet Avelis, accent orange, fond bleuté.
+   Les cartes flottent au-dessus de la toile 3D ; leurs emprises sont reprises par le cadrage de
+   la caméra (MARGES_CARTES de cadrage.js). */
+:root {
+  --violet: #3d2a7a;
+  --violet-pale: #efedf6;
+  --violet-doux: #6b5fa8;
+  --orange: #e06a2c;
+  --orange-pale: #fcebe1;
+  --vert: #23824f;
+  --vert-pale: #e2f3e9;
+  --encre: #1c1a2b;
+  --encre-2: #55536a;
+  --muet: #8b8a9c;
+  --trait: #e6e5ee;
+  --carte: #ffffff;
+  --fond: #eef0f6;
+  --rayon: 16px;
+  --rayon-petit: 10px;
+  --ombre: 0 6px 24px rgba(40, 32, 90, 0.1), 0 1px 3px rgba(40, 32, 90, 0.08);
+  --ombre-menu: 0 12px 36px rgba(40, 32, 90, 0.16), 0 2px 6px rgba(40, 32, 90, 0.08);
+  --marge: 12px; /* écart des cartes au bord de la fenêtre et entre elles */
+  --haut-barre: 56px;
+  --haut-cartes: calc(var(--marge) * 2 + var(--haut-barre)); /* sous la barre du haut */
+  --haut-bas: 84px; /* au-dessus du curseur de temps */
+  --largeur-colonne: 272px; /* colonne de droite : détail ou légende, onglets */
+  /* bord droit des cartes de gauche : colonne, commandes de la vue (48 px) et leurs écarts */
+  --reserve-droite: calc(var(--largeur-colonne) + 48px + var(--marge) * 3);
+  --police: "Inter Variable", "Segoe UI", system-ui, sans-serif; /* police.js */
+  font-family: var(--police);
+  font-size: 13px;
+  font-feature-settings: "cv11"; /* « a » à un étage d'Inter, plus lisible en petit */
+  color: var(--encre);
+}
+
+html,
+body,
+#racine {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--fond);
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+.visionneuse {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+.carte {
+  position: absolute;
+  z-index: 10;
+  box-sizing: border-box;
+  background: var(--carte);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+}
+
+.icone {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+kbd {
+  padding: 0 5px;
+  border: 1px solid var(--trait);
+  border-radius: 5px;
+  background: var(--fond);
+  color: var(--encre-2);
+  font: inherit;
+  font-size: 11px;
+}
+
+.bouton-rond {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  padding: 0;
+  border: none;
+  border-radius: var(--rayon-petit);
+  background: none;
+  color: var(--violet);
+  cursor: pointer;
+}
+
+.bouton-rond:hover,
+.bouton-rond[aria-expanded="true"] {
+  background: var(--violet-pale);
+}
+
+/* ── Barre du haut ── */
+
+.barre-haut {
+  top: var(--marge);
+  left: var(--marge);
+  right: var(--marge);
+  z-index: 12; /* ses menus passent au-dessus des autres cartes */
+  height: var(--haut-barre);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 0 12px;
+}
+
+.titre {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+
+.titre div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.titre strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--violet);
+}
+
+.titre span {
+  font-size: 12px;
+  color: var(--muet);
+  white-space: nowrap;
+}
+
+.embleme {
+  width: 32px;
+  height: 32px;
+  fill: var(--violet);
+}
+
+.embleme path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.recherche {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 260px;
+  max-width: 380px;
+  min-width: 170px;
+  height: 36px;
+  margin-left: 8px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border-radius: var(--rayon-petit);
+  background: var(--fond);
+  color: var(--muet);
+}
+
+.recherche input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--encre);
+}
+
+.recherche:focus-within {
+  box-shadow: inset 0 0 0 2px var(--violet-doux);
+}
+
+.lecture-horloge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  height: 36px;
+  padding: 0 14px 0 4px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--violet-pale);
+}
+
+.bouton-lecture {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--orange);
+  color: #fff;
+  cursor: pointer;
+}
+
+.bouton-lecture .icone {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  stroke-width: 2.4;
+}
+
+.lecture-horloge .point {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muet);
+}
+
+.lecture-horloge[data-lecture="true"] .point {
+  background: var(--orange);
+  animation: battement 1.2s ease-in-out infinite;
+}
+
+@keyframes battement {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+button.horloge, input.horloge {
+  width: 124px;
+  padding: 2px 4px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  cursor: text;
+}
+
+button.horloge:hover, input.horloge {
+  border-color: var(--violet);
+}
+
+input.horloge[aria-invalid="true"] {
+  border-color: #d8464b;
+}
+
+.horloge {
+  min-width: 112px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--violet);
+  white-space: nowrap;
+}
+
+.barre-haut .espace {
+  flex: 1 1 0;
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 1px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--orange);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+.scenario {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--trait);
+  border-radius: 999px;
+  background: none;
+  color: var(--encre-2);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.scenario:hover,
+.scenario[aria-expanded="true"] {
+  border-color: var(--violet-doux);
+  color: var(--violet);
+}
+
+.scenario .icone {
+  width: 16px;
+  height: 16px;
+}
+
+/* Menus déroulants de la barre du haut (propositions, alertes, scénario, aide) */
+.menu-ancre {
+  position: relative;
+}
+
+.menu {
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 30;
+  width: 340px;
+  max-height: min(70vh, 480px);
+  overflow-y: auto;
+  padding: 12px;
+  box-shadow: var(--ombre-menu);
+}
+
+.menu h2 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 2px 4px 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.menu h2 span,
+.menu .vide {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muet);
+}
+
+.menu .vide {
+  margin: 4px;
+}
+
+.menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu li > button,
+.menu li > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: var(--rayon-petit);
+  background: none;
+  text-align: left;
+}
+
+.menu li > button {
+  cursor: pointer;
+}
+
+.menu li > button:hover {
+  background: var(--violet-pale);
+}
+
+.propositions {
+  left: 0;
+  right: auto;
+  width: 100%;
+  min-width: 320px;
+  padding: 6px;
+}
+
+.propositions strong {
+  color: var(--violet);
+}
+
+.propositions span {
+  overflow: hidden;
+  color: var(--encre-2);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entete-alerte {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.alertes li + li {
+  border-top: 1px solid var(--trait);
+}
+
+.alertes .nature {
+  font-weight: 600;
+  color: var(--orange);
+}
+
+.alertes time {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muet);
+}
+
+.alertes .texte-alerte,
+.alertes .zone {
+  font-size: 12px;
+  color: var(--encre-2);
+}
+
+.alertes .zone {
+  color: var(--muet);
+}
+
+.details-scenario dl {
+  margin: 0 4px 10px;
+}
+
+.details-scenario dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--trait);
+}
+
+.details-scenario dt {
+  color: var(--muet);
+}
+
+.details-scenario dd {
+  margin: 0;
+  font-weight: 500;
+  text-align: right;
+}
+
+.aide p {
+  margin: 0 4px 10px;
+  line-height: 1.7;
+  color: var(--encre-2);
+}
+
+/* ── Cartes d'indicateurs ── */
+
+.indicateurs {
+  position: absolute;
+  top: var(--haut-cartes);
+  left: var(--marge);
+  right: var(--reserve-droite); /* laisse la place des commandes de la vue et de la colonne */
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.indicateur {
+  position: relative;
+  flex: 0 1 224px;
+  min-width: 0;
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  pointer-events: auto;
+}
+
+.pictogramme {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: var(--rayon-petit);
+  background: var(--violet-pale);
+  color: var(--violet);
+}
+
+.indicateur .corps {
+  min-width: 0;
+}
+
+.indicateur h2,
+.indicateur .detail {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muet);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.indicateur .detail {
+  font-weight: 400;
+}
+
+.indicateur .valeur {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  color: var(--encre);
+}
+
+.variation {
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--fond);
+  color: var(--encre-2);
+}
+
+.variation[data-ton="bon"] {
+  background: var(--vert-pale);
+  color: var(--vert);
+}
+
+.variation[data-ton="alerte"] {
+  background: var(--orange-pale);
+  color: var(--orange);
+}
+
+.variation[data-ton="stable"] {
+  color: var(--muet);
+}
+
+/* Fenêtre étroite : les pictogrammes laissent leur place aux valeurs */
+@media (max-width: 1400px) {
+  .indicateur .pictogramme {
+    display: none;
+  }
+}
+
+/* ── Légende et commandes de la vue ── */
+
+.legende ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legende li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 21px;
+}
+
+.legende .nombre {
+  margin-left: auto;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--violet);
+}
+
+.pastille {
+  flex: none;
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(28, 26, 43, 0.25);
+  border-radius: 4px;
+}
+
+.case {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  accent-color: var(--violet);
+}
+
+/* Commandes de la vue : colonne de boutons à icônes, à gauche de la colonne de droite */
+.commandes-vue {
+  top: var(--haut-cartes);
+  right: calc(var(--largeur-colonne) + var(--marge) * 2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+}
+
+.commandes-vue button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: var(--rayon-petit);
+  background: none;
+  color: var(--violet);
+  cursor: pointer;
+}
+
+.commandes-vue button:hover {
+  background: var(--violet-pale);
+}
+
+.commandes-vue button[aria-pressed="true"] {
+  background: var(--violet);
+  color: #fff;
+}
+
+.commandes-vue .separateur {
+  height: 1px;
+  margin: 3px 6px;
+  background: var(--trait);
+}
+
+/* Compteur d'images (index.html?mesure=1) */
+.mesure {
+  left: var(--marge);
+  bottom: var(--haut-bas);
+  padding: 4px 10px;
+  border-radius: var(--rayon-petit);
+  font-variant-numeric: tabular-nums;
+  color: var(--encre-2);
+}
+
+/* ── Curseur de temps ── */
+
+.commandes {
+  left: var(--marge);
+  right: var(--marge);
+  bottom: var(--marge);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 60px;
+  padding: 0 14px 0 10px;
+}
+
+.temps {
+  position: relative;
+  flex: 1;
+  min-width: 160px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.temps[data-fin="true"] {
+  cursor: ew-resize;
+}
+
+/* Le pointeur est géré par .temps (glisser et réglage fin, Commandes.jsx) ; l'entrée garde le
+   clavier et le focus */
+.curseur {
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  background: none;
+  pointer-events: none;
+  appearance: none;
+}
+
+/* Bulle de l'heure précise, au-dessus du pouce tant que le curseur est appuyé ; gardée dans la
+   largeur du curseur près des bords */
+.bulle-temps {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: clamp(80px, calc(8px + var(--progression) * (100% - 16px)), calc(100% - 80px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 160px;
+  padding: 6px 12px;
+  border-radius: var(--rayon-petit);
+  background: var(--violet);
+  color: #fff;
+  box-shadow: var(--ombre);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.bulle-temps strong {
+  font-size: 15px;
+}
+
+.bulle-temps span {
+  font-size: 11px;
+  color: #d9d5ee;
+}
+
+.bulle-temps[data-fin="true"] {
+  background: var(--orange);
+}
+
+.bulle-temps[data-fin="true"] span {
+  color: #fff;
+}
+
+.curseur::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--orange) var(--progression), var(--trait) 0);
+}
+
+.curseur::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--orange) var(--progression), var(--trait) 0);
+}
+
+/* Pouce de 16 px : les repères le suivent (8 px de chaque côté, .reperes > span) */
+.curseur::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  margin-top: -5px;
+  box-sizing: border-box;
+  border: 3px solid var(--orange);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(40, 32, 90, 0.25);
+  appearance: none;
+}
+
+.curseur::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 3px solid var(--orange);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.curseur:focus-visible {
+  outline: 2px solid var(--violet-doux);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Repères sous le curseur, placés comme le centre du pouce (qui ne déborde pas de la piste) */
+.reperes {
+  position: relative;
+  height: 14px;
+  margin-top: 2px;
+  pointer-events: none;
+}
+
+.reperes > span {
+  position: absolute;
+  top: 0;
+  left: calc(8px + var(--part) * (100% - 16px));
+}
+
+.jour {
+  height: 12px;
+  padding-left: 4px;
+  border-left: 1px solid var(--trait);
+  font-size: 10px;
+  line-height: 12px;
+  color: var(--muet);
+}
+
+.marque-alerte {
+  width: 2px;
+  height: 5px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--orange);
+  opacity: 0.6;
+}
+
+.vitesse {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muet);
+}
+
+/* Jumeau numérique : suivre l'heure réelle ; vert tant que la vue la suit */
+.direct {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon-petit);
+  background: #fff;
+  color: var(--muet);
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.direct[data-actif="true"] {
+  border-color: var(--vert);
+  background: var(--vert-pale);
+  color: var(--vert);
+}
+
+.vitesse select {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon-petit);
+  background: #fff;
+  color: var(--encre);
+}
+
+/* ── Calques de la vue : étiquettes, pilule, épingles, infobulle ── */
+
+.calque-etiquettes {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.etiquette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden; /* jusqu'à sa première projection */
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--encre);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.etiquette.discrete {
+  background: none;
+  color: var(--encre-2);
+  font-style: italic;
+}
+
+/* Pilule de l'objet sélectionné et épingles des quais, au-dessus des étiquettes et sous les
+   cartes ; leur bas est posé sur le point suivi (Suivi.jsx). */
+.calque-suivi {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.pilule,
+.epingle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden; /* jusqu'à sa première projection */
+  user-select: none;
+}
+
+.pilule {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--violet);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(40, 32, 90, 0.3);
+}
+
+.pilule span {
+  font-weight: 400;
+  color: #d9d5ee;
+}
+
+.epingle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 2px 3px rgba(40, 32, 90, 0.3));
+}
+
+.epingle svg {
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  padding: 5px;
+  border-radius: 50%;
+  background: var(--violet);
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Pointe de l'épingle, sous le disque */
+.epingle::after {
+  content: "";
+  margin-top: -2px;
+  border-top: 8px solid var(--violet);
+  border-right: 6px solid transparent;
+  border-left: 6px solid transparent;
+}
+
+.epingle:not([data-operation="chargement"]) .chargement,
+.epingle[data-operation="chargement"] .dechargement {
+  display: none;
+}
+
+.infobulle {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 320px;
+  padding: 7px 11px;
+  border-radius: var(--rayon-petit);
+  background: var(--violet);
+  color: #fff;
+  box-shadow: var(--ombre);
+  pointer-events: none;
+}
+
+.infobulle span {
+  color: #d9d5ee;
+}
+
+.message {
+  max-width: 640px;
+  margin: 15vh auto 0;
+  padding: 0 16px;
+}
+
+.message h1 {
+  margin-bottom: 12px;
+  font-size: 18px;
+  color: var(--violet);
+}
+
+/* ── Colonne de droite : détail ou légende, puis onglets ── */
+
+.colonne-droite {
+  position: absolute;
+  top: var(--haut-cartes);
+  right: var(--marge);
+  bottom: var(--haut-bas);
+  z-index: 10;
+  width: var(--largeur-colonne);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.colonne-droite > .carte {
+  position: relative;
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  pointer-events: auto;
+}
+
+.colonne-droite > .cartes-onglets[data-ouverte="true"] {
+  flex: 1 1 auto;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.colonne-droite > .cartes-onglets[data-ouverte="false"],
+.colonne-droite > .carte[data-ouverte="false"] {
+  flex: none;
+}
+
+/* En-tête commun des cartes repliables et du détail */
+.entete-carte {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+
+.entete-carte h2 {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entete-carte h2 span {
+  margin-left: 6px;
+  font-weight: 400;
+  color: var(--muet);
+}
+
+.entete-carte .bouton-rond {
+  width: 30px;
+  height: 30px;
+}
+
+.entete-carte .icone {
+  width: 18px;
+  height: 18px;
+}
+
+.repliable {
+  padding: 8px 10px 10px 14px;
+}
+
+.repliable[data-ouverte="false"] {
+  padding-bottom: 8px;
+}
+
+.legende h2:not(.entete-carte h2) {
+  margin: 8px 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muet);
+}
+
+.lien {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--violet);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--violet-pale);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.lien:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Badges de statut */
+.statut {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--fond);
+  color: var(--encre-2);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.statut[data-ton="bon"] {
+  background: var(--vert-pale);
+  color: var(--vert);
+}
+
+.statut[data-ton="en_cours"] {
+  background: var(--violet-pale);
+  color: var(--violet);
+}
+
+.statut[data-ton="attente"] {
+  background: #fdf4dc;
+  color: #8a5a00;
+}
+
+.statut[data-ton="alerte"] {
+  background: var(--orange-pale);
+  color: var(--orange);
+}
+
+/* Panneau de détail */
+.panneau-detail {
+  padding: 8px 10px 14px 14px;
+}
+
+.panneau-detail .identifiant {
+  margin: 2px 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--violet);
+  overflow-wrap: anywhere;
+}
+
+.progression {
+  margin-top: 12px;
+}
+
+.progression .piste {
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--trait);
+}
+
+.progression .piste span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 4px;
+}
+
+.progression .survenus {
+  background: #c9c3e6;
+}
+
+.progression .affiches {
+  background: var(--violet);
+}
+
+.progression p {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muet);
+}
+
+.proprietes {
+  margin: 12px 0 0;
+}
+
+.proprietes div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-top: 1px solid var(--trait);
+}
+
+.proprietes dt {
+  flex: none;
+  color: var(--muet);
+}
+
+.proprietes dd {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 2px 8px;
+  margin: 0;
+  min-width: 0;
+  font-weight: 500;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* Onglets Quais / Camions / Stocks */
+.onglets {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--rayon-petit);
+  background: var(--fond);
+}
+
+.onglets button {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--encre-2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.onglets button[aria-selected="true"] {
+  background: var(--carte);
+  color: var(--violet);
+  box-shadow: 0 1px 3px rgba(40, 32, 90, 0.12);
+}
+
+.contenu-onglet {
+  flex: 1;
+  min-height: 0;
+  margin-top: 6px;
+  overflow-y: auto;
+}
+
+.liste {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.liste li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-top: 1px solid var(--trait);
+}
+
+.liste li:first-child {
+  border-top: none;
+}
+
+.liste .principal {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+}
+
+.liste small {
+  overflow: hidden;
+  color: var(--muet);
+  font-size: 11px;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.liste .principal .lien {
+  align-self: flex-start;
+}
+
+.objets-stock {
+  display: flex;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.objets-stock > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vide {
+  color: var(--muet);
+  font-size: 12px;
+}
+
+/* ── Timeline de traçabilité (en bas à gauche) ── */
+
+.tracabilite {
+  left: var(--marge);
+  right: calc(var(--marge) * 2 + var(--largeur-colonne));
+  bottom: var(--haut-bas);
+  max-width: 980px;
+}
+
+.legende-etats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 2px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+  color: var(--muet);
+}
+
+.legende-etats li::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  border-radius: 50%;
+  background: var(--teinte-etat);
+}
+
+.etapes {
+  display: flex;
+  margin: 6px 0 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+}
+
+.etapes li {
+  position: relative; /* teinte : [data-etat] ci-dessous (une règle ici l'emporterait) */
+  flex: 1 0 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 0 4px;
+  text-align: center;
+}
+
+[data-etat="affichee"] {
+  --teinte-etat: var(--violet);
+}
+
+[data-etat="attente"] {
+  --teinte-etat: #d9a400;
+}
+
+[data-etat="non_lue"] {
+  --teinte-etat: var(--orange);
+}
+
+[data-etat="position"] {
+  --teinte-etat: #8b8a9c;
+}
+
+[data-etat="a_venir"] {
+  --teinte-etat: var(--trait);
+}
+
+/* Trait qui relie une étape à la suivante, au niveau des ronds */
+.etapes li + li::before {
+  content: "";
+  position: absolute;
+  top: 13px;
+  right: calc(50% + 15px);
+  left: calc(-50% + 15px);
+  height: 2px;
+  background: var(--teinte-etat);
+}
+
+.etapes li[data-etat="a_venir"]::before {
+  background: repeating-linear-gradient(to right, var(--trait) 0 4px, transparent 4px 8px);
+}
+
+.etapes .rond {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--teinte-etat);
+  border-radius: 50%;
+  background: var(--carte);
+  color: var(--teinte-etat);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.etapes li[data-etat="affichee"] .rond {
+  background: var(--violet);
+  color: #fff;
+}
+
+.etapes li[data-etat="a_venir"] .rond {
+  color: var(--muet);
+}
+
+.etapes .rond .icone {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.4;
+}
+
+.etapes li[data-courante="true"] .rond {
+  box-shadow: 0 0 0 4px var(--orange-pale), 0 0 0 6px var(--orange);
+}
+
+.etapes .nom {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.etapes li[data-etat="a_venir"] .nom {
+  color: var(--muet);
+  font-weight: 500;
+}
+
+.etapes time {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muet);
+}
+
+.tracabilite .vide {
+  margin: 6px 0 2px;
+}

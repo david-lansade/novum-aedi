@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Base atelier</title>
+<style>
+  :root { --fond: #F3F5F9; --carte: #fff; --texte: #1C2230; --doux: #667085; --bord: #DFE3EA; --marine: #1F2A44;
+          --orange: #F28C38; --vert: #1F9D55; --rouge: #D92D20; --ambre: #B54708; --bleu: #2F6FDE;
+          --vert-f: #E7F6EE; --rouge-f: #FDECEA; --ambre-f: #FFF4E5; --bleu-f: #EAF1FD; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--fond); color: var(--texte); font-size: 14px; }
+  header { background: var(--marine); color: #fff; padding: 12px 20px; display: flex; align-items: center; gap: 18px; }
+  header h1 { font-size: 18px; margin: 0; flex: 1; }
+  header .tel { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  header .tel img { width: 64px; height: 64px; background: #fff; border-radius: 6px; padding: 3px; }
+  header code { background: rgba(255,255,255,.15); padding: 3px 7px; border-radius: 5px; font-size: 14px; }
+  nav { display: flex; gap: 4px; padding: 0 16px; background: #fff; border-bottom: 1px solid var(--bord); overflow-x: auto; }
+  nav button { border: 0; background: none; padding: 13px 14px; font: inherit; font-weight: 600; color: var(--doux); border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; }
+  nav button.actif { color: var(--marine); border-color: var(--orange); }
+  main { padding: 16px 20px 40px; }
+  .onglet { display: none; } .onglet.actif { display: block; }
+  .grille { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .bloc { background: var(--carte); border: 1px solid var(--bord); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .05em; color: var(--doux); margin: 0 0 12px; }
+  .tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .tuile { background: var(--carte); border: 1px solid var(--bord); border-radius: 12px; padding: 12px 14px; border-top: 4px solid var(--bleu); }
+  .tuile b { display: block; font-size: 26px; } .tuile span { color: var(--doux); font-size: 12px; text-transform: uppercase; }
+  .tuile.rouge { border-top-color: var(--rouge); } .tuile.vert { border-top-color: var(--vert); } .tuile.orange { border-top-color: var(--orange); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--doux); font-weight: 600; padding: 7px 8px; border-bottom: 2px solid var(--bord); position: sticky; top: 0; background: var(--carte); }
+  td { padding: 7px 8px; border-bottom: 1px solid var(--bord); vertical-align: top; }
+  #t-pieces td:nth-child(n+7), #t-pieces td:first-child b { white-space: nowrap; }
+  tr.clic { cursor: pointer; } tr.clic:hover { background: var(--bleu-f); }
+  .defile { max-height: 560px; overflow: auto; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--bleu-f); color: var(--bleu); white-space: nowrap; }
+  .badge.defaut, .badge.rebut, .badge.bloque, .badge.vide, .badge.refuse, .badge.alerte { background: var(--rouge-f); color: var(--rouge); }
+  .badge.integree, .badge.expediee, .badge.terminee, .badge.en_stock, .badge.pleine, .badge.accepte { background: var(--vert-f); color: var(--vert); }
+  .badge.creee, .badge.en_preparation { background: var(--ambre-f); color: var(--ambre); }
+  label { display: block; font-size: 12px; color: var(--doux); margin: 10px 0 3px; }
+  input, select, textarea { font: inherit; padding: 8px 10px; border: 1px solid var(--bord); border-radius: 8px; width: 100%; background: #fff; }
+  button.b { font: inherit; font-weight: 600; padding: 9px 14px; border-radius: 8px; border: 0; background: var(--marine); color: #fff; cursor: pointer; margin-top: 12px; }
+  button.b.orange { background: var(--orange); } button.b.rouge { background: var(--rouge); } button.b.clair { background: #E8ECF3; color: var(--texte); }
+  .filtres { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 12px; flex-wrap: wrap; }
+  .filtres > div { min-width: 170px; }
+  .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .colonne { background: #E9EDF4; border-radius: 12px; padding: 10px; min-height: 160px; }
+  .colonne h3 { margin: 4px 4px 10px; font-size: 13px; }
+  .carte-k { background: #fff; border-radius: 10px; padding: 10px; margin-bottom: 8px; border-left: 4px solid var(--bleu); }
+  .carte-k.retard { border-left-color: var(--rouge); background: var(--rouge-f); }
+  .fiche dl { display: grid; grid-template-columns: 150px 1fr; gap: 5px 10px; margin: 0; }
+  .fiche dt { color: var(--doux); } .fiche dd { margin: 0; font-weight: 600; }
+  .doux { color: var(--doux); } .rouge { color: var(--rouge); } .vert { color: var(--vert); }
+  #notif { position: fixed; right: 20px; bottom: 20px; padding: 12px 16px; border-radius: 10px; background: var(--marine); color: #fff; display: none; max-width: 420px; }
+  .etiq-liste { columns: 3; font-size: 13px; } .etiq-liste label { color: var(--texte); font-size: 13px; margin: 3px 0; display: flex; gap: 6px; align-items: center; break-inside: avoid; }
+  .etiq-liste input { width: auto; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Atelier Avelis · Base de traçabilité et kanban</h1>
+  <div class="tel"><img id="qr-accueil" alt=""><div>Sur le téléphone :<br><code id="url-tel">…</code></div></div>
+</header>
+<nav id="nav"></nav>
+<main>
+  <section class="onglet" id="o-bord">
+    <div class="tuiles" id="tuiles"></div>
+    <div class="grille">
+      <div class="bloc"><h2>En-cours par poste</h2><table id="t-postes"></table></div>
+      <div class="bloc"><h2>Derniers scans</h2><div class="defile" style="max-height:400px"><table id="t-derniers"></table></div></div>
+    </div>
+  </section>
+
+  <section class="onglet" id="o-pieces">
+    <div class="filtres">
+      <div><label>Type</label><select id="f-type"><option value="">Tous</option></select></div>
+      <div><label>Statut</label><select id="f-statut"><option value="">Tous</option><option value="creee">Créée</option><option value="en_cours">En cours</option><option value="defaut">En défaut</option><option value="integree">Intégrée</option><option value="expediee">Expédiée</option><option value="en_stock">En stock (lots)</option><option value="rebut">Rebut</option></select></div>
+      <div style="flex:1"><label>Recherche (code, lot, module…)</label><input id="f-q"></div>
+    </div>
+    <div class="grille" style="grid-template-columns: 3fr 2fr">
+      <div class="bloc defile" style="max-height:640px"><table id="t-pieces"></table></div>
+      <div class="bloc fiche" id="fiche"><h2>Fiche</h2><p class="doux">Cliquez sur une pièce.</p></div>
+    </div>
+  </section>
+
+  <section class="onglet" id="o-creer">
+    <div class="grille">
+      <div class="bloc"><h2>Module complet (1 logement)</h2>
+        <p class="doux">Crée le module et ses sous-ensembles avec le même numéro : pod, kit 2D, ossature 1D (+ fenêtre, porte, pompe à chaleur, tableau électrique), reliés au module.</p>
+        <label>Nombre de modules</label><input id="m-nombre" type="number" value="1" min="1" max="50">
+        <label>Chantier de destination</label><select id="m-dest"></select>
+        <label>Lot de l'ossature (facultatif)</label><input id="m-lot-oss" placeholder="LOT-0001">
+        <label>Lot du pod et des composants (facultatif)</label><input id="m-lot-pod" placeholder="LOT-0002">
+        <label style="display:flex;gap:6px;color:var(--texte)"><input id="m-comp" type="checkbox" checked style="width:auto"> avec les composants suivis par n° de série</label>
+        <button class="b orange" onclick="creerModules()">Créer</button>
+      </div>
+      <div class="bloc"><h2>Lot de matières</h2>
+        <label>Fournisseur</label><select id="l-four"></select>
+        <label>Référence</label><input id="l-ref" placeholder="Profilés acier S355">
+        <label>Quantité</label><input id="l-qte" type="number">
+        <button class="b" onclick="creerLot()">Créer le lot</button>
+      </div>
+      <div class="bloc"><h2>Pièce isolée</h2>
+        <label>Type</label><select id="p-type"></select>
+        <label>Code (vide = automatique)</label><input id="p-code">
+        <label>Désignation</label><input id="p-des">
+        <label>Lot</label><input id="p-lot">
+        <label>Fournisseur</label><select id="p-four"><option value="">—</option></select>
+        <label>Module parent</label><input id="p-parent">
+        <label>N° de série</label><input id="p-serie">
+        <label>Destination</label><input id="p-dest">
+        <button class="b" onclick="creerPiece()">Créer la pièce</button>
+      </div>
+      <div class="bloc"><h2>Carte kanban</h2>
+        <label>Référence</label><input id="k-ref" placeholder="VIS-M8">
+        <label>Désignation</label><input id="k-des" placeholder="Vis M8 × 40">
+        <label>Quantité par bac</label><input id="k-qte" type="number" value="100">
+        <label>Poste consommateur</label><select id="k-poste"></select>
+        <label>Source</label><input id="k-src" value="Magasin">
+        <label>Délai cible (min)</label><input id="k-delai" type="number">
+        <button class="b" onclick="creerCarte()">Créer la carte</button>
+        <h2 style="margin-top:20px">Combien de cartes ?</h2>
+        <div class="filtres"><div><label>Conso / heure</label><input id="c-conso" type="number" value="60"></div><div><label>Délai (h)</label><input id="c-delai" type="number" value="0.5" step="0.1"></div><div><label>Marge</label><input id="c-marge" type="number" value="0.2" step="0.05"></div><div><label>Qté / bac</label><input id="c-qte" type="number" value="20"></div></div>
+        <button class="b clair" onclick="calculCartes()">Calculer</button> <b id="c-res"></b>
+      </div>
+      <div class="bloc"><h2>Base de données</h2>
+        <p class="doux">La base commence vide. Le jeu d'essai crée 2 lots, 1 module complet et 3 cartes kanban (délai 3 min) pour tester.</p>
+        <button class="b clair" onclick="demo()">Créer le jeu d'essai</button>
+        <button class="b rouge" onclick="vider()">Vider la base</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="onglet" id="o-kanban">
+    <div class="kanban" id="kanban"></div>
+    <div class="bloc" style="margin-top:14px"><h2>Performance du réapprovisionnement</h2><table id="t-cartes"></table></div>
+  </section>
+
+  <section class="onglet" id="o-consignes">
+    <div class="bloc"><h2>Envoyer une consigne à un poste</h2>
+      <div class="filtres"><div><label>Poste</label><select id="cs-poste"></select></div><div style="flex:1"><label>Message</label><input id="cs-msg"></div><div><button class="b" onclick="envoyerConsigne()">Envoyer</button></div></div>
+    </div>
+    <div class="bloc"><h2>Consignes</h2><label style="display:flex;gap:6px;color:var(--texte)"><input type="checkbox" id="cs-toutes" style="width:auto" onchange="chargerConsignes()"> afficher aussi les consignes acquittées</label><table id="t-consignes"></table></div>
+  </section>
+
+  <section class="onglet" id="o-journal">
+    <div class="bloc"><h2>Exports pour Excel</h2><div id="exports"></div></div>
+    <div class="bloc defile"><table id="t-journal"></table></div>
+  </section>
+
+  <section class="onglet" id="o-etiq">
+    <div class="bloc"><h2>Étiquettes QR à imprimer</h2>
+      <p class="doux">Le QR code contient l'adresse de la page de scan : l'appareil photo du téléphone l'ouvre directement. Si l'adresse du PC change (nouveau partage de connexion), réimprimez.</p>
+      <p class="doux"><b>Puces NFC</b> (même usage que le QR) : elles s'écrivent depuis le téléphone Android, fiche de la pièce ou de la carte → « Écrire ce code sur une puce NFC ». La puce reçoit la même adresse : la toucher avec un téléphone ouvre la fiche, ou « Lire une puce NFC » sur la page de scan. Chaque scan garde son moyen (QR, NFC, saisie) dans le journal. Si l'adresse du PC change, réécrivez les puces comme on réimprime les étiquettes.</p>
+      <button class="b clair" onclick="cocher(true)">Tout cocher</button> <button class="b clair" onclick="cocher(false)">Tout décocher</button>
+      <button class="b orange" onclick="imprimer()">Ouvrir la page d'impression</button>
+      <div class="etiq-liste" id="etiq-liste" style="margin-top:14px"></div>
+    </div>
+  </section>
+</main>
+<div id="notif"></div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+let K = null, ongletActif = "o-bord", pieceOuverte = null;
+const ONGLETS = [["o-bord", "Tableau de bord"], ["o-pieces", "Pièces"], ["o-creer", "Créer"], ["o-kanban", "Kanban"],
+                 ["o-consignes", "Consignes"], ["o-journal", "Journal et exports"], ["o-etiq", "Étiquettes"]];
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const h = (t) => t ? new Date(t * 1000).toLocaleString("fr-FR", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"}) : "";
+function duree(s) { if (s == null) return ""; s = Math.round(s); if (s < 60) return s + " s"; const m = Math.floor(s / 60), hh = Math.floor(m / 60); return hh ? `${hh} h ${String(m % 60).padStart(2, "0")}` : `${m} min ${String(s % 60).padStart(2, "0")}`; }
+const posteNom = (id) => id === "*" ? "Tous les postes" : ((K.postes.find((p) => p.id === id) || {}).nom || id || "");
+function notif(t, erreur) { const n = $("notif"); n.textContent = t; n.style.background = erreur ? "var(--rouge)" : "var(--marine)"; n.style.display = "block"; clearTimeout(n._t); n._t = setTimeout(() => n.style.display = "none", 4000); }
+async function api(chemin, corps) {
+  const r = await fetch(chemin, corps ? {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(corps)} : {});
+  const d = await r.json(); if (!r.ok) throw new Error(d.erreur || "Erreur"); return d;
+}
+async function essayer(f) { try { return await f(); } catch (e) { notif(e.message, true); } }
+function options(sel, liste, vide) { $(sel).innerHTML = (vide ? `<option value="">${vide}</option>` : "") + liste.map(([v, t]) => `<option value="${esc(v)}">${esc(t)}</option>`).join(""); }
+
+function montrer(id) {
+  ongletActif = id;
+  document.querySelectorAll(".onglet").forEach((o) => o.classList.toggle("actif", o.id === id));
+  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("actif", b.dataset.o === id));
+  rafraichir();
+}
+
+// ───────────────────────────── tableau de bord
+async function chargerBord() {
+  const e = await api("/api/etat");
+  const st = e.par_statut, k = e.cartes;
+  const tuiles = [["Pièces suivies", e.pieces, ""], ["En cours", st.en_cours || 0, "orange"], ["Pas encore scannées", st.creee || 0, ""],
+                  ["En défaut", st.defaut || 0, (st.defaut ? "rouge" : "vert")], ["Lots bloqués", e.lots_bloques.length, e.lots_bloques.length ? "rouge" : "vert"],
+                  ["Intégrées / expédiées", (st.integree || 0) + " / " + (st.expediee || 0), "vert"],
+                  ["Bacs vides / en route", (k.vide || 0) + " / " + (k.en_preparation || 0), (k.vide ? "orange" : "")], ["Consignes actives", e.consignes_actives, e.consignes_actives ? "orange" : ""]];
+  $("tuiles").innerHTML = tuiles.map(([l, v, c]) => `<div class="tuile ${c}"><span>${l}</span><b>${v}</b></div>`).join("");
+  const postes = Object.entries(e.par_poste);
+  $("t-postes").innerHTML = "<tr><th>Poste</th><th>Pièces présentes</th></tr>" + (postes.length ? postes.map(([p, n]) => `<tr><td>${esc(p)}</td><td><b>${n}</b></td></tr>`).join("") : "<tr><td colspan=2 class=doux>Aucune pièce en cours</td></tr>");
+  $("t-derniers").innerHTML = "<tr><th>Heure</th><th>Code</th><th>Événement</th><th>Poste</th><th>Résultat</th></tr>" + e.derniers.map((v) =>
+    `<tr><td>${h(v.t)}</td><td>${esc(v.code)}</td><td>${esc(v.evenement)}<div class="doux">${esc(v.message)}</div></td><td>${esc(posteNom(v.poste))}</td><td><span class="badge ${v.resultat}">${esc(v.resultat)}</span></td></tr>`).join("");
+}
+
+// ───────────────────────────── pièces
+async function chargerPieces() {
+  const q = new URLSearchParams({type: $("f-type").value, statut: $("f-statut").value, q: $("f-q").value});
+  const liste = await api("/api/pieces?" + q);
+  $("t-pieces").innerHTML = "<tr><th>Code</th><th>Type</th><th>Statut</th><th>Poste actuel</th><th>Depuis</th><th>Prochaine étape</th><th>Lot</th><th>Module</th></tr>" +
+    (liste.length ? liste.map((p) => `<tr class="clic" onclick="ouvrirFiche('${esc(p.code)}')"><td><b>${esc(p.code)}</b><div class="doux">${esc(p.designation)}</div></td><td>${esc(p.type)}</td>
+      <td><span class="badge ${p.lot_bloque ? "bloque" : p.statut}">${esc(p.lot_bloque ? "lot bloqué" : p.statut_libelle)}</span>${p.defauts_ouverts ? ' <span class="badge defaut">défaut</span>' : ""}${p.bloque ? ' <span class="badge bloque">BLOQUÉ</span>' : ""}</td>
+      <td>${esc(p.poste_nom)}</td><td>${duree(p.temps_poste_s)}</td><td>${esc(p.prochaine)}</td><td>${esc(p.lot)}</td><td>${esc(p.parent)}</td></tr>`).join("")
+     : "<tr><td colspan=8 class=doux>Aucune pièce. Créez-en dans l'onglet « Créer ».</td></tr>");
+  if (pieceOuverte) ouvrirFiche(pieceOuverte, true);
+}
+async function ouvrirFiche(code, silencieux) {
+  pieceOuverte = code;
+  const o = await api("/api/objet/" + encodeURIComponent(code));
+  if (o.genre !== "piece") return;
+  const p = o.piece;
+  const lot = p.type === "lot";
+  $("fiche").innerHTML = `<h2>Fiche ${esc(p.code)}</h2>
+    <dl><dt>Type</dt><dd>${esc(o.type_libelle)}</dd><dt>Désignation</dt><dd>${esc(p.designation)}</dd>
+      <dt>Statut</dt><dd><span class="badge ${o.lot_bloque ? "bloque" : p.statut}">${esc(o.lot_bloque ? "lot bloqué " + o.lot_bloque : o.statut_libelle)}</span></dd>
+      <dt>Poste actuel</dt><dd>${esc(o.poste_nom)}</dd><dt>Prochaine étape</dt><dd>${o.prochaine ? esc(o.prochaine.etape + " → " + o.prochaine.poste_nom) : "—"}</dd>
+      <dt>Vient de</dt><dd>${esc(p.origine)}</dd><dt>Va vers</dt><dd>${esc(p.destination)}</dd>
+      <dt>Lot</dt><dd>${esc(p.lot || (lot ? p.code : "—"))}</dd><dt>Module</dt><dd>${esc(p.parent || "—")}</dd>
+      <dt>N° de série</dt><dd>${esc(p.numero_serie || "—")}</dd><dt>Créée le</dt><dd>${h(p.t_creation)}</dd>
+      ${p.t_fin ? `<dt>Terminée le</dt><dd>${h(p.t_fin)} (en ${duree(p.t_fin - p.t_creation)})</dd>` : ""}
+      ${p.bloque ? `<dt>Motif du blocage</dt><dd class="rouge">${esc(p.motif_blocage)}</dd>` : ""}</dl>
+    <div>${lot ? (p.bloque ? `<button class="b" onclick="debloquer('${p.code}')">Débloquer le lot</button>` : `<button class="b rouge" onclick="bloquer('${p.code}')">Bloquer le lot</button>`) : ""}
+      <button class="b clair" onclick="window.open('/etiquettes?codes=${encodeURIComponent(p.code)}')">Étiquette</button></div>
+    <h2 style="margin-top:16px">Gamme</h2><table>${o.gamme.map((g) => `<tr><td class="${g.faite ? "vert" : "doux"}">${g.faite ? "✓" : "○"} ${esc(g.etape)}</td><td class="doux">${esc(g.poste_nom)}</td></tr>`).join("")}</table>
+    <h2 style="margin-top:16px">Temps passé à chaque poste</h2><table><tr><th>Poste</th><th>Entrée</th><th>Sortie</th><th>Durée</th></tr>${o.sejours.map((s) => `<tr><td>${esc(s.poste_nom)}</td><td>${h(s.t_entree)}</td><td>${s.en_cours ? "<i>en cours</i>" : h(s.t_sortie)}</td><td><b>${duree(s.duree_s)}</b></td></tr>`).join("") || "<tr><td colspan=4 class=doux>Aucun passage</td></tr>"}</table>
+    ${o.enfants.length ? `<h2 style="margin-top:16px">Composants</h2><table>${o.enfants.map((e) => `<tr class="clic" onclick="ouvrirFiche('${esc(e.code)}')"><td>${esc(e.code)}</td><td>${esc(e.designation)}</td><td><span class="badge ${e.statut}">${esc(e.statut)}</span></td></tr>`).join("")}</table>` : ""}
+    ${o.defauts.length ? `<h2 style="margin-top:16px">Défauts</h2><table>${o.defauts.map((d) => `<tr><td>${h(d.t)}</td><td>${esc(d.categorie)} · ${esc(d.gravite)}<div class="doux">${esc(d.cause)} ${esc(d.description)}</div></td><td><span class="badge ${d.statut === "ouvert" ? "defaut" : "terminee"}">${esc(d.statut)}</span></td></tr>`).join("")}</table>` : ""}
+    <h2 style="margin-top:16px">Historique</h2><table>${o.evenements.map((e) => `<tr><td>${h(e.t)}</td><td>${esc(e.evenement)}<div class="doux">${esc(e.message)}${e.force ? " · forcé : " + esc(e.motif) : ""}</div></td><td>${esc(posteNom(e.poste))}</td><td>${esc(e.operateur)}</td><td><span class="badge ${e.resultat}">${esc(e.resultat)}</span></td></tr>`).join("")}</table>`;
+}
+async function bloquer(lot) { const m = prompt("Motif du blocage :", "Blocage qualité"); if (m === null) return; await essayer(async () => { const r = await api(`/api/lots/${lot}/bloquer`, {motif: m}); notif(`Lot ${lot} bloqué, ${r.isolees} pièce(s) à isoler.`); }); rafraichir(); }
+async function debloquer(lot) { const m = prompt("Motif du déblocage :", "Lot contrôlé conforme"); if (m === null) return; await essayer(() => api(`/api/lots/${lot}/debloquer`, {motif: m})); notif(`Lot ${lot} débloqué.`); rafraichir(); }
+
+// ───────────────────────────── création
+async function creerModules() {
+  await essayer(async () => {
+    const lots = {}; if ($("m-lot-oss").value) lots.ossature = $("m-lot-oss").value; if ($("m-lot-pod").value) { lots.pod = $("m-lot-pod").value; lots.composant = $("m-lot-pod").value; }
+    const r = await api("/api/modules", {nombre: +$("m-nombre").value, destination: $("m-dest").value, avec_composants: $("m-comp").checked, lots});
+    notif(`${r.codes.length} pièces créées : ${r.codes.filter((c) => c.startsWith("MOD")).join(", ")}`);
+  });
+}
+async function creerLot() { await essayer(async () => { const r = await api("/api/lots", {fournisseur: $("l-four").value, reference: $("l-ref").value, quantite: $("l-qte").value}); notif("Lot créé : " + r.code); }); }
+async function creerPiece() {
+  await essayer(async () => {
+    const r = await api("/api/pieces", {type_piece: $("p-type").value, code: $("p-code").value, designation: $("p-des").value, lot: $("p-lot").value,
+      fournisseur: $("p-four").value, parent: $("p-parent").value, numero_serie: $("p-serie").value, destination: $("p-dest").value});
+    notif("Pièce créée : " + r.code);
+  });
+}
+async function creerCarte() {
+  await essayer(async () => {
+    const r = await api("/api/cartes", {reference: $("k-ref").value, designation: $("k-des").value, quantite: $("k-qte").value, poste_conso: $("k-poste").value, source: $("k-src").value, delai_min: $("k-delai").value});
+    notif("Carte créée : " + r.code);
+  });
+}
+async function calculCartes() { await essayer(async () => { const r = await api(`/api/kanban/calcul?conso_h=${$("c-conso").value}&delai_h=${$("c-delai").value}&marge=${$("c-marge").value}&qte=${$("c-qte").value}`); $("c-res").textContent = ` → ${r.cartes} cartes`; }); }
+async function demo() { await essayer(async () => { const r = await api("/api/demo", {}); notif(`${r.codes.length} éléments créés (jeu d'essai).`); }); }
+async function vider() { const c = prompt("Toute la base sera effacée. Tapez VIDER pour confirmer :"); if (c === null) return; await essayer(async () => { await api("/api/vider", {confirmation: c}); notif("Base vidée."); pieceOuverte = null; }); }
+
+// ───────────────────────────── kanban
+async function chargerKanban() {
+  const cartes = await api("/api/cartes");
+  const cols = [["pleine", "Bac plein"], ["vide", "Bac vide · à préparer"], ["en_preparation", "En route"]];
+  $("kanban").innerHTML = cols.map(([e, t]) => `<div class="colonne"><h3>${t} (${cartes.filter((c) => c.etat === e).length})</h3>${cartes.filter((c) => c.etat === e).map((c) =>
+    `<div class="carte-k ${c.en_retard ? "retard" : ""}"><b>${esc(c.code)}</b> · ${c.quantite} × ${esc(c.designation)}<div class="doux">${esc(c.poste_nom)}${c.attente_min != null ? ` · attente ${c.attente_min.toFixed(1)} min / ${c.delai_min}` : ""}</div></div>`).join("")}</div>`).join("");
+  $("t-cartes").innerHTML = "<tr><th>Carte</th><th>Article</th><th>Poste</th><th>Délai cible</th><th>Cycles</th><th>Délai moyen</th><th>Retards</th></tr>" + (cartes.map((c) =>
+    `<tr><td>${esc(c.code)}</td><td>${esc(c.reference)} · ${esc(c.designation)}</td><td>${esc(c.poste_nom)}</td><td>${c.delai_min} min</td><td>${c.cycles}</td><td>${c.delai_moyen_min != null ? c.delai_moyen_min.toFixed(1) + " min" : "—"}</td><td class="${c.retards ? "rouge" : ""}">${c.retards}</td></tr>`).join("") || "<tr><td colspan=7 class=doux>Aucune carte</td></tr>");
+}
+
+// ───────────────────────────── consignes
+async function chargerConsignes() {
+  const liste = await api("/api/consignes" + ($("cs-toutes").checked ? "?toutes=1" : ""));
+  $("t-consignes").innerHTML = "<tr><th>Heure</th><th>Poste</th><th>Type</th><th>Message</th><th>Statut</th><th></th></tr>" + (liste.map((c) =>
+    `<tr><td>${h(c.t)}</td><td>${esc(c.poste_nom)}</td><td>${esc(c.type)}</td><td>${esc(c.message)}</td><td>${c.statut === "active" ? '<span class="badge creee">active</span>' : `<span class="badge terminee">vue</span> <span class="doux">${esc(c.op_acquit || "")} ${h(c.t_acquit)}</span>`}</td>
+     <td>${c.statut === "active" ? `<button class="b clair" style="margin:0" onclick="acquitter(${c.id})">Acquitter</button>` : ""}</td></tr>`).join("") || "<tr><td colspan=6 class=doux>Aucune consigne</td></tr>");
+}
+async function envoyerConsigne() { await essayer(async () => { await api("/api/consignes", {poste: $("cs-poste").value, message: $("cs-msg").value}); $("cs-msg").value = ""; notif("Consigne envoyée."); chargerConsignes(); }); }
+async function acquitter(id) { await api(`/api/consignes/${id}/acquitter`, {operateur: "PC"}); chargerConsignes(); }
+
+// ───────────────────────────── journal et étiquettes
+async function chargerJournal() {
+  const liste = (await api("/api/evenements?limite=100000")).slice(-300).reverse();
+  const moyens = (K && K.moyens) || {};
+  $("t-journal").innerHTML = "<tr><th>#</th><th>Heure</th><th>Code</th><th>Type</th><th>Événement</th><th>Poste</th><th>Zone</th><th>Opérateur</th><th>Moyen</th><th>Résultat</th><th>Détail</th></tr>" + liste.map((e) =>
+    `<tr><td class="doux">${e.id}</td><td>${h(e.t)}</td><td>${esc(e.code)}</td><td>${esc(e.type)}</td><td>${esc(e.evenement)}</td><td>${esc(posteNom(e.poste))}</td><td>${esc(e.zone)}</td><td>${esc(e.operateur)}</td><td>${esc(moyens[e.moyen] || "")}</td><td><span class="badge ${e.resultat}">${esc(e.resultat)}</span></td><td>${esc(e.message)}${e.force ? " · forcé : " + esc(e.motif) : ""}</td></tr>`).join("");
+}
+async function chargerEtiquettes() {
+  const pieces = await api("/api/pieces"), cartes = await api("/api/cartes");
+  const coches = new Set([...document.querySelectorAll(".etiq-liste input:checked")].map((i) => i.value));
+  const items = [...pieces.map((p) => [p.code, p.designation]), ...cartes.map((c) => [c.code, "Kanban · " + c.designation])];
+  $("etiq-liste").innerHTML = items.map(([c, d]) => `<label><input type="checkbox" value="${esc(c)}" ${coches.has(c) ? "checked" : ""}> <b>${esc(c)}</b> <span class="doux">${esc(d)}</span></label>`).join("") || "<span class=doux>Rien à étiqueter.</span>";
+}
+function cocher(v) { document.querySelectorAll(".etiq-liste input").forEach((i) => i.checked = v); }
+function imprimer() { const c = [...document.querySelectorAll(".etiq-liste input:checked")].map((i) => i.value); if (!c.length) return notif("Cochez au moins une étiquette.", true); window.open("/etiquettes?codes=" + encodeURIComponent(c.join(","))); }
+
+async function rafraichir() {
+  try {
+    if (ongletActif === "o-bord") await chargerBord();
+    if (ongletActif === "o-pieces") await chargerPieces();
+    if (ongletActif === "o-kanban") await chargerKanban();
+    if (ongletActif === "o-consignes") await chargerConsignes();
+    if (ongletActif === "o-journal") await chargerJournal();
+    if (ongletActif === "o-etiq") await chargerEtiquettes();
+  } catch (e) { notif("Serveur injoignable : " + e.message, true); }
+}
+
+(async function demarrer() {
+  K = await api("/api/config");
+  $("url-tel").textContent = K.url + "/";
+  if (K.qr_disponible) $("qr-accueil").src = "/qr_accueil.svg"; else $("qr-accueil").remove();
+  $("nav").innerHTML = ONGLETS.map(([id, t]) => `<button data-o="${id}" onclick="montrer('${id}')">${t}</button>`).join("");
+  const types = Object.entries(K.types).map(([id, t]) => [id, t.libelle]);
+  options("f-type", types, "Tous"); options("p-type", types.filter(([id]) => id !== "lot"));
+  const fourn = Object.entries(K.fournisseurs).map(([c, n]) => [c, c + " · " + n]);
+  options("l-four", fourn); options("p-four", fourn, "—");
+  options("m-dest", K.chantiers.map((c) => [c, c]));
+  const postes = K.postes.map((p) => [p.id, p.nom]);
+  options("k-poste", postes); options("cs-poste", [["*", "Tous les postes"], ...postes]);
+  $("k-delai").value = K.delai_kanban_min;
+  $("exports").innerHTML = ["pieces", "evenements", "sejours", "defauts", "cartes", "demandes", "consignes"].map((t) => `<a class="b clair" style="display:inline-block;text-decoration:none;margin-right:6px" href="/export/${t}.csv">${t}.csv</a>`).join("");
+  ["f-type", "f-statut"].forEach((i) => $(i).onchange = chargerPieces);
+  $("f-q").oninput = chargerPieces;
+  montrer("o-bord");
+  setInterval(() => { if (!["o-creer", "o-etiq"].includes(ongletActif)) rafraichir(); }, 3000);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# Dépendances d'avelis_flux (Python ≥ 3.10)
+# Installation : py -3 -m pip install -r avelis_flux/requirements.txt
+matplotlib>=3.7
+numpy>=1.24
+pillow>=9.5
+
+# Optionnel : QR codes des modules et étiquettes (l'application fonctionne sans)
+# qrcode[pil]>=7.4
